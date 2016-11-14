@@ -47,6 +47,7 @@ class Network:
         
         self.batch_size = 200
     
+    # TODO: set strides and padding
     def build_network(self, input_data):
         network = lasagne.layers.InputLayer((None, 3, 32, 32), input_var=input_data)
         conv_layer_1 = lasagne.layers.Conv2DLayer(network, num_filters=3, filter_size=(10, 10), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
@@ -75,12 +76,12 @@ class Network:
         return lasagne.objectives.categorical_crossentropy(self.predict(deterministic=True), labels).mean()
     
     
+    # TODO: add more optimization schemes and handle exceptions
     def updates(self, optimization_scheme, loss, learning_rate):
         params = lasagne.layers.get_all_params(self.network, trainable=True)
         if optimization_scheme == 'sgd':
             return lasagne.updates.sgd(loss, params, learning_rate=learning_rate)
         else:
-            #handle exception... TODO
             pass
     
     def batches(self, X, Y, batch_size):
@@ -90,6 +91,8 @@ class Network:
             Y_batch = Y[train_idxs[i:i+batch_size]]
             yield X_batch, Y_batch
 
+
+    # saves the filters of the convolutional layers as png images
     def get_conv_filters(self):
         from PIL import Image
         for (i, cl) in enumerate(self.conv_layers):
@@ -97,8 +100,7 @@ class Network:
             print(params.shape)
             for f in range(params.shape[0]):
                 filter = (np.moveaxis(params[f,:,:,:], 0, 2)*255).astype('uint8')
-                #print(filter)
-                #print(filter.shape)
+
                 Image.fromarray(filter).save("filter_"+str(i)+"_"+str(f)+".png")
             
             
