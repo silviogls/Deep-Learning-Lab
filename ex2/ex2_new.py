@@ -1,5 +1,4 @@
 
-
 import numpy as np
 import os
 import time
@@ -50,17 +49,27 @@ class Network:
     
     # TODO: set strides and padding
     def build_network(self, input_data):
+        N_FILTERS = 36
+        FILTER_SIZE = 5
+        DENSE_UNITS_1 = 30
+        DENSE_UNITS_2 = 30
         network = lasagne.layers.InputLayer((None, 3, 32, 32), input_var=input_data)
-        conv_layer_1 = lasagne.layers.Conv2DLayer(network, num_filters=16, pad = 'same', filter_size=(5, 5), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
+        conv_layer_1 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
         network = lasagne.layers.MaxPool2DLayer(conv_layer_1, pool_size=(2, 2))
-        conv_layer_2 = lasagne.layers.Conv2DLayer(network, num_filters=16, pad = 'same', filter_size=(5, 5), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
+        conv_layer_2 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
         network = lasagne.layers.MaxPool2DLayer(conv_layer_2, pool_size=(2, 2))
-        #network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=50, nonlinearity=lasagne.nonlinearities.rectify)
-        network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=100, nonlinearity=lasagne.nonlinearities.rectify)
-        network = lasagne.layers.DenseLayer(network, num_units=20, nonlinearity=lasagne.nonlinearities.softmax)
+        conv_layer_3 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
+        network = lasagne.layers.MaxPool2DLayer(conv_layer_3, pool_size=(2, 2))
+        network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=DENSE_UNITS_1, nonlinearity=lasagne.nonlinearities.rectify)
+        network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=DENSE_UNITS_2, nonlinearity=lasagne.nonlinearities.rectify)
+        network = lasagne.layers.DenseLayer(network, num_units=2, nonlinearity=lasagne.nonlinearities.softmax)
         self.network = network
-        self.conv_layers = [conv_layer_1, conv_layer_2]
+        self.conv_layers = [conv_layer_1, conv_layer_2, conv_layer_3]
         
+        print("n of filters: "+str(N_FILTERS))
+        print("filters size: "+str(FILTER_SIZE))
+        print("n of units in fully connected layers: "+str(DENSE_UNITS_1))
+
         return network
         
     def predict(self, deterministic = None):
@@ -107,17 +116,19 @@ class Network:
         for (i, cl) in enumerate(self.conv_layers):
             params = cl.get_params()[0].get_value()  #I guess get_params()[1] is the bias, TODO: sum the bias...
             print(params.shape)
+
             for channel in range(params.shape[1]):
                 #filter = (np.moveaxis(params[f,:,:,:], 0, 2)*255).astype('uint8')
                 side = int(math.sqrt(params.shape[0]))
-                filter_rows  = []
+                filter_size = params.shape[2]
+                filter_matrix = Image.new("L", (side*(filter_size+1), side*(filter_size+1)))
                 for c in range(side):
-                    filters = []
                     for r in range(side):
-                        filters.append((params[r*side+c, channel, :, :]*255).astype('uint8'))
-                    filter_rows.append(np.concatenate(np.array(filters), axis=0))
-                filter_matrix = np.concatenate(np.array(filter_rows), axis=1)
-                Image.fromarray(filter_matrix).save("filters/filter_"+str(channel)+".png")
+                        filter_matrix.paste( Image.fromarray((params[r*side+c, channel, :, :]*255).astype('uint8')), (r*(filter_size+1), c*(filter_size+1)) )
+                    #filter_rows.append( np.concatenate(np.array(filters), axis=0) )
+                #filter_matrix = np.concatenate(np.array(filter_rows), axis=1)
+                #Image.fromarray(filter_matrix).save("filters/filter_"+str(channel)+".png")
+                filter_matrix.save("filters/filter_"+str(i)+"_"+str(channel)+".png")
             
     
     # TODO: optimization scheme choice with parameter?
@@ -136,12 +147,12 @@ class Network:
         
         params = lasagne.layers.get_all_params(self.network, trainable=True)
         #train_function = theano.function([input_data, labels], loss, updates=self.updates('rmsprop', loss, 0.3))
-        train_function = theano.function([input_data, labels], loss, updates=lasagne.updates.sgd(loss, params, learning_rate=0.03))
+        train_function = theano.function([input_data, labels], loss, updates=lasagne.updates.rmsprop(loss, params, learning_rate=0.001))
         validation_function = theano.function([input_data, labels], [loss_test, test_accuracy] )   # good?
         
         print("Traning progress:")
         print("(epoch, time, training error, validation error, validation accuracy)")
-        TRAINING_SET_SIZE = 200000
+        TRAINING_SET_SIZE = 100000
         VALIDATION_SET_SIZE = 50000
         for epoch in range(max_epochs):
             training_loss = 0
@@ -165,13 +176,12 @@ class Network:
                 count += 1
             validation_error = validation_loss/count
             
-            #if epoch%5 == 0: self.get_conv_filters()
+            if epoch%5 == 0: self.get_conv_filters()
             print("{} of {}, {:d} , {:.6f}, {:.6f} , {:.6f}".format(epoch+1, max_epochs, int(time.time()-start_time), training_error, validation_error, validation_accuracy/count*100))
         
-        #self.get_conv_filters()
+        self.get_conv_filters()
         #~ print("Test error: {:.6f}".format(validation_function(input_batch, labels_batch)))
                 
 net = Network()
 net.load_data()
 net.train(30, 100)
-
