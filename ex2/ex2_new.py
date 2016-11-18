@@ -49,8 +49,8 @@ class Network:
     
     # TODO: set strides and padding
     def build_network(self, input_data):
-        N_FILTERS = 36
-        FILTER_SIZE = 5
+        N_FILTERS = 25
+        FILTER_SIZE = 10
         DENSE_UNITS_1 = 30
         DENSE_UNITS_2 = 30
         network = lasagne.layers.InputLayer((None, 3, 32, 32), input_var=input_data)
@@ -109,26 +109,26 @@ class Network:
             yield X_batch, Y_batch
 
 
-    # saves the filters of the convolutional layers as png images
+    # saves the filters of the first convolutional layer as png images (BN for now)
     def get_conv_filters(self):
         import math
         from PIL import Image
-        for (i, cl) in enumerate(self.conv_layers):
-            params = cl.get_params()[0].get_value()  #I guess get_params()[1] is the bias, TODO: sum the bias...
-            print(params.shape)
 
-            for channel in range(params.shape[1]):
-                #filter = (np.moveaxis(params[f,:,:,:], 0, 2)*255).astype('uint8')
-                side = int(math.sqrt(params.shape[0]))
-                filter_size = params.shape[2]
-                filter_matrix = Image.new("L", (side*(filter_size+1), side*(filter_size+1)))
-                for c in range(side):
-                    for r in range(side):
-                        filter_matrix.paste( Image.fromarray((params[r*side+c, channel, :, :]*255).astype('uint8')), (r*(filter_size+1), c*(filter_size+1)) )
-                    #filter_rows.append( np.concatenate(np.array(filters), axis=0) )
-                #filter_matrix = np.concatenate(np.array(filter_rows), axis=1)
-                #Image.fromarray(filter_matrix).save("filters/filter_"+str(channel)+".png")
-                filter_matrix.save("filters/filter_"+str(i)+"_"+str(channel)+".png")
+        params = self.conv_layers[0].get_params()[0].get_value()  #I guess get_params()[1] is the bias, TODO: sum the bias...
+        print(params.shape)
+#        for channel in range(params.shape[1]):
+        
+        side = int(math.sqrt(params.shape[0]))
+        filter_size = params.shape[2]
+        filter_matrix = Image.new("RGB", (side*(filter_size+1), side*(filter_size+1)))
+        for c in range(side):
+            for r in range(side):
+                
+                filter_matrix.paste( 
+                    Image.fromarray( np.moveaxis((params[r*side+c, :, :, :]*255).astype('uint8'), 0, 2), 'RGB' ), 
+                    (r*(filter_size+1), c*(filter_size+1)) )
+                    
+        filter_matrix.save("filters/filter_"+".png")
             
     
     # TODO: optimization scheme choice with parameter?
