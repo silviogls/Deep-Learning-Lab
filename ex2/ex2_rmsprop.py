@@ -141,8 +141,6 @@ class Network:
         input_data = T.tensor4('inputs')
         labels = T.matrix('labels')
         self.build_network(input_data)
-        pred = lasagne.layers.get_output(self.network, deterministic=True)
-        pred_function = theano.function([input_data], pred)
         loss = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network), labels).mean()
         loss_test = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network, deterministic=True), labels).mean()
         #test_accuracy = T.mean(T.eq(T.argmax(lasagne.layers.get_output(self.network, deterministic=True), axis=1), labels), dtype=theano.config.floatX)
@@ -163,7 +161,6 @@ class Network:
             start_time = time.time()
             for input_batch, labels_batch in self.batches(self.train_images[:TRAINING_SET_SIZE,:,:,:], self.train_labels[:TRAINING_SET_SIZE,20], batch_size):
                 start_time_batch = time.time()
-#                print(pred_function(input_batch))
                 new_loss = train_function(input_batch, labels_batch)
                 #if count<10: print(new_loss)
                 training_loss += new_loss
