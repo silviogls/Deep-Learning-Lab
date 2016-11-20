@@ -49,20 +49,20 @@ class Network:
     
     # TODO: set strides and padding
     def build_network(self, input_data):
-        N_FILTERS = 25
+        N_FILTERS = 36
         FILTER_SIZE = 10
-        DENSE_UNITS_1 = 30
-        DENSE_UNITS_2 = 30
+        DENSE_UNITS_1 = 100
+        DENSE_UNITS_2 = 20
         network = lasagne.layers.InputLayer((None, 3, 32, 32), input_var=input_data)
         conv_layer_1 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
         network = lasagne.layers.MaxPool2DLayer(conv_layer_1, pool_size=(2, 2))
         conv_layer_2 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
-        network = lasagne.layers.MaxPool2DLayer(conv_layer_2, pool_size=(2, 2))
+        network = lasagne.layers.MaxPool2DLayer(conv_layer_2, pool_size=(3, 3))
         conv_layer_3 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
-        network = lasagne.layers.MaxPool2DLayer(conv_layer_3, pool_size=(2, 2))
+        network = lasagne.layers.MaxPool2DLayer(conv_layer_3, pool_size=(3, 3))
         network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=DENSE_UNITS_1, nonlinearity=lasagne.nonlinearities.rectify)
         network = lasagne.layers.DenseLayer(lasagne.layers.dropout(network, p=.5), num_units=DENSE_UNITS_2, nonlinearity=lasagne.nonlinearities.rectify)
-        network = lasagne.layers.DenseLayer(network, num_units=2, nonlinearity=lasagne.nonlinearities.softmax)
+        network = lasagne.layers.DenseLayer(network, num_units=1, nonlinearity=lasagne.nonlinearities.sigmoid)
         self.network = network
         self.conv_layers = [conv_layer_1, conv_layer_2, conv_layer_3]
         
@@ -105,12 +105,12 @@ class Network:
         train_idxs = np.random.permutation(X.shape[0])
         for i in range(0, X.shape[0], batch_size):
             X_batch = X[train_idxs[i:i+batch_size]]
-            Y_batch = Y[train_idxs[i:i+batch_size]]
+            Y_batch = Y[train_idxs[i:i+batch_size]].reshape(-1,1)
             yield X_batch, Y_batch
 
 
     # saves the filters of the first convolutional layer as png images (BN for now)
-    def get_conv_filters(self):
+    def get_conv_filters(self, id):
         import math
         from PIL import Image
 
@@ -120,7 +120,7 @@ class Network:
         
         side = int(math.sqrt(params.shape[0]))
         filter_size = params.shape[2]
-        filter_matrix = Image.new("RGB", (side*(filter_size+1), side*(filter_size+1)))
+        filter_matrix = Image.new('RGB', (side*(filter_size+1), side*(filter_size+1)))
         for c in range(side):
             for r in range(side):
                 
@@ -128,7 +128,7 @@ class Network:
                     Image.fromarray( np.moveaxis((params[r*side+c, :, :, :]*255).astype('uint8'), 0, 2), 'RGB' ), 
                     (r*(filter_size+1), c*(filter_size+1)) )
                     
-        filter_matrix.save("filters/filter_"+".png")
+        filter_matrix.save("filters/filter_"+str(id)+".png")
             
     
     # TODO: optimization scheme choice with parameter?
@@ -139,21 +139,23 @@ class Network:
             return
         
         input_data = T.tensor4('inputs')
-        labels = T.ivector('labels')
+        labels = T.matrix('labels')
         self.build_network(input_data)
-        loss = lasagne.objectives.categorical_crossentropy(lasagne.layers.get_output(self.network), labels).mean()
-        loss_test = lasagne.objectives.categorical_crossentropy(lasagne.layers.get_output(self.network, deterministic=True), labels).mean()
-        test_accuracy = T.mean(T.eq(T.argmax(lasagne.layers.get_output(self.network, deterministic=True), axis=1), labels), dtype=theano.config.floatX)
-        
+        pred = lasagne.layers.get_output(self.network, deterministic=True)
+        pred_function = theano.function([input_data], pred)
+        loss = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network), labels).mean()
+        loss_test = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network, deterministic=True), labels).mean()
+        #test_accuracy = T.mean(T.eq(T.argmax(lasagne.layers.get_output(self.network, deterministic=True), axis=1), labels), dtype=theano.config.floatX)
+        test_accuracy = T.mean(T.eq(T.round(lasagne.layers.get_output(self.network, deterministic=True)), labels), dtype=theano.config.floatX)        
         params = lasagne.layers.get_all_params(self.network, trainable=True)
         #train_function = theano.function([input_data, labels], loss, updates=self.updates('rmsprop', loss, 0.3))
-        train_function = theano.function([input_data, labels], loss, updates=lasagne.updates.rmsprop(loss, params, learning_rate=0.001))
-        validation_function = theano.function([input_data, labels], [loss_test, test_accuracy] )   # good?
+        train_function = theano.function([input_data, labels], loss, updates=lasagne.updates.rmsprop(loss, params, learning_rate=0.0005))
+        validation_function = theano.function( [input_data, labels], [loss_test, test_accuracy] )   # good?
         
         print("Traning progress:")
         print("(epoch, time, training error, validation error, validation accuracy)")
-        TRAINING_SET_SIZE = 100000
-        VALIDATION_SET_SIZE = 50000
+        TRAINING_SET_SIZE =   200000
+        VALIDATION_SET_SIZE = 200000
         for epoch in range(max_epochs):
             training_loss = 0
             count = 0
@@ -161,27 +163,33 @@ class Network:
             start_time = time.time()
             for input_batch, labels_batch in self.batches(self.train_images[:TRAINING_SET_SIZE,:,:,:], self.train_labels[:TRAINING_SET_SIZE,20], batch_size):
                 start_time_batch = time.time()
-                training_loss += train_function(input_batch, labels_batch)
+#                print(pred_function(input_batch))
+                new_loss = train_function(input_batch, labels_batch)
+                #if count<10: print(new_loss)
+                training_loss += new_loss
                 count += 1
                 #print(int(time.time()-start_time_batch))
             training_error = training_loss/count
             
+            
+#            print("\n********")
             count = 0
             validation_loss = 0
             validation_accuracy = 0
             for input_batch, labels_batch in self.batches(self.val_images[:VALIDATION_SET_SIZE,:,:,:], self.val_labels[:VALIDATION_SET_SIZE,20], batch_size):
                 val_err, val_acc = validation_function(input_batch, labels_batch)
+#                if count<10: print(val_err)
                 validation_accuracy += val_acc
                 validation_loss += val_err
                 count += 1
             validation_error = validation_loss/count
             
-            if epoch%5 == 0: self.get_conv_filters()
+            if epoch%2 == 1: self.get_conv_filters(epoch)
             print("{} of {}, {:d} , {:.6f}, {:.6f} , {:.6f}".format(epoch+1, max_epochs, int(time.time()-start_time), training_error, validation_error, validation_accuracy/count*100))
         
-        self.get_conv_filters()
+        self.get_conv_filters("final")
         #~ print("Test error: {:.6f}".format(validation_function(input_batch, labels_batch)))
                 
 net = Network()
 net.load_data()
-net.train(30, 100)
+net.train(60, 500)
