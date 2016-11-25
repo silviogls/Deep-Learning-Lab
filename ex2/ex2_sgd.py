@@ -49,9 +49,9 @@ class Network:
     
     # TODO: set strides and padding
     def build_network(self, input_data):
-        N_FILTERS = 36
+        N_FILTERS = 25
         FILTER_SIZE = 10
-        DENSE_UNITS_1 = 100
+        DENSE_UNITS_1 = 50
         DENSE_UNITS_2 = 20
         network = lasagne.layers.InputLayer((None, 3, 32, 32), input_var=input_data)
         conv_layer_1 = lasagne.layers.Conv2DLayer(network, num_filters=N_FILTERS, pad = 'same', filter_size=(FILTER_SIZE, FILTER_SIZE), nonlinearity=lasagne.nonlinearities.rectify, W=lasagne.init.GlorotUniform())
@@ -115,7 +115,12 @@ class Network:
         from PIL import Image
 
         params = self.conv_layers[0].get_params()[0].get_value()  #I guess get_params()[1] is the bias, TODO: sum the bias...
+        for f in range(params.shape[0]):
+            params[f,:,:,:] -= params[f,:,:,:].min()
+            params[f,:,:,:] /= params[f,:,:,:].max()
         print(params.shape)
+        print(params.min())
+        print(params.max())
 #        for channel in range(params.shape[1]):
         
         side = int(math.sqrt(params.shape[0]))
@@ -141,6 +146,8 @@ class Network:
         input_data = T.tensor4('inputs')
         labels = T.matrix('labels')
         self.build_network(input_data)
+        pred = lasagne.layers.get_output(self.network, deterministic=True)
+        pred_function = theano.function([input_data], pred)
         loss = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network), labels).mean()
         loss_test = lasagne.objectives.binary_crossentropy(lasagne.layers.get_output(self.network, deterministic=True), labels).mean()
         #test_accuracy = T.mean(T.eq(T.argmax(lasagne.layers.get_output(self.network, deterministic=True), axis=1), labels), dtype=theano.config.floatX)
@@ -161,6 +168,7 @@ class Network:
             start_time = time.time()
             for input_batch, labels_batch in self.batches(self.train_images[:TRAINING_SET_SIZE,:,:,:], self.train_labels[:TRAINING_SET_SIZE,20], batch_size):
                 start_time_batch = time.time()
+#                print(pred_function(input_batch))
                 new_loss = train_function(input_batch, labels_batch)
                 #if count<10: print(new_loss)
                 training_loss += new_loss
@@ -189,4 +197,4 @@ class Network:
                 
 net = Network()
 net.load_data()
-net.train(70, 500)
+net.train(70, 256)
