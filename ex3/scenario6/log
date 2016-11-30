@@ -1,0 +1,217 @@
+
+n_filters, 10
+learning_rate, 0.01
+momentum, 0.0
+batch_size, 16
+
+
+n_filters, 20
+learning_rate, 0.01
+momentum, 0.0
+batch_size, 16
+
+
+n_filters, 20
+learning_rate, 0.02
+momentum, 0.0
+batch_size, 16
+
+
+n_filters, 20
+learning_rate, 0.02
+momentum, 0.1
+batch_size, 16
+
+
+n_filters, 20
+learning_rate, 0.02
+momentum, 0.1
+batch_size, 31
+
+
+n_filters, 30
+learning_rate, 0.02
+momentum, 0.1
+batch_size, 31
+
+
+n_filters, 30
+learning_rate, 0.03
+momentum, 0.1
+batch_size, 31
+
+
+n_filters, 30
+learning_rate, 0.03
+momentum, 0.2
+batch_size, 31
+
+
+n_filters, 30
+learning_rate, 0.03
+momentum, 0.2
+batch_size, 46
+
+
+n_filters, 40
+learning_rate, 0.03
+momentum, 0.2
+batch_size, 46
+
+
+n_filters, 40
+learning_rate, 0.04
+momentum, 0.2
+batch_size, 46
+
+
+n_filters, 40
+learning_rate, 0.04
+momentum, 0.3
+batch_size, 46
+
+
+n_filters, 40
+learning_rate, 0.04
+momentum, 0.3
+batch_size, 61
+
+
+n_filters, 50
+learning_rate, 0.04
+momentum, 0.3
+batch_size, 61
+
+
+n_filters, 50
+learning_rate, 0.05
+momentum, 0.3
+batch_size, 61
+
+
+n_filters, 50
+learning_rate, 0.05
+momentum, 0.4
+batch_size, 61
+
+
+n_filters, 50
+learning_rate, 0.05
+momentum, 0.4
+batch_size, 76
+
+
+n_filters, 60
+learning_rate, 0.05
+momentum, 0.4
+batch_size, 76
+
+
+n_filters, 60
+learning_rate, 0.06
+momentum, 0.4
+batch_size, 76
+
+
+n_filters, 60
+learning_rate, 0.06
+momentum, 0.5
+batch_size, 76
+
+
+n_filters, 60
+learning_rate, 0.06
+momentum, 0.5
+batch_size, 91
+
+
+n_filters, 70
+learning_rate, 0.06
+momentum, 0.5
+batch_size, 91
+
+
+n_filters, 70
+learning_rate, 0.07
+momentum, 0.5
+batch_size, 91
+
+
+n_filters, 70
+learning_rate, 0.07
+momentum, 0.6
+batch_size, 91
+
+
+n_filters, 70
+learning_rate, 0.07
+momentum, 0.6
+batch_size, 106
+
+
+n_filters, 80
+learning_rate, 0.07
+momentum, 0.6
+batch_size, 106
+
+
+n_filters, 80
+learning_rate, 0.08
+momentum, 0.6
+batch_size, 106
+
+
+n_filters, 80
+learning_rate, 0.08
+momentum, 0.7
+batch_size, 106
+
+
+n_filters, 80
+learning_rate, 0.08
+momentum, 0.7
+batch_size, 121
+
+
+n_filters, 90
+learning_rate, 0.08
+momentum, 0.7
+batch_size, 121
+
+
+n_filters, 90
+learning_rate, 0.09
+momentum, 0.7
+batch_size, 121
+
+
+n_filters, 90
+learning_rate, 0.09
+momentum, 0.8
+batch_size, 121
+
+
+n_filters, 90
+learning_rate, 0.09
+momentum, 0.8
+batch_size, 136
+
+
+n_filters, 100
+learning_rate, 0.09
+momentum, 0.8
+batch_size, 136
+
+
+n_filters, 100
+learning_rate, 0.1
+momentum, 0.8
+batch_size, 136
+
+
+n_filters, 100
+learning_rate, 0.1
+momentum, 0.9
+batch_size, 136
+
+
