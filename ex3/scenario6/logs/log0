@@ -1,6 +1,0 @@
-n_filters, 10
-learning_rate, 0.01
-momentum, 0.0
-batch_size, 16
-
-
