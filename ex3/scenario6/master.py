@@ -1,6 +1,8 @@
 import numpy as np
+import os
 
-## idea: a hp object returns the next_configuration as a dictionary of hyperparameters.
+## hp object returns the next_configuration as a dictionary of hyperparameters.
+## it computes the new configuration based on some search/optimization algorithm (eg random search)
 
 
 
@@ -26,12 +28,13 @@ class HPConfiguration:
         return ret
         
 
-N_WORKERS = 1
-
+## we are going to put ONE configuration in each file (makes it simpler to code)
+if not os.path.exists('logs/'):
+    os.makedirs('logs/')
+COUNT = 0
 hpconf = HPConfiguration()
-while(True):
-    f = open('log', 'a')
-    #~ print(hpconf.get_next_configuration())
+while(COUNT < 2):
+    f = open('logs/log'+str(COUNT), 'a'); COUNT += 1
     conf = hpconf.get_next_configuration()
     for hp in conf:
         f.write(str(hp[0])+", "+str(hp[1])+"\n")
