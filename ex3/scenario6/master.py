@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import csv
-
+from datetime import datetime
 ## hp object returns the next_configuration as a dictionary of hyperparameters.
 ## it computes the new configuration based on some search/optimization algorithm (eg random search)
 
@@ -39,15 +39,16 @@ class HPConfiguration:
         
 
 ## we are going to put ONE configuration in each file (makes it simpler to code)
-if not os.path.exists('logs/'):
-    os.makedirs('logs/')
+logsdir = "logs"+str(datetime.today()).replace(" ","_").replace(":","_").replace(".","_")+"/"
+if not os.path.exists(logsdir):
+    os.makedirs(logsdir)
 COUNT = 0
 N_WORKERS = 2
 hpconf = HPConfiguration()
 
 ## make initial configuration files
 for i in range(N_WORKERS):
-    f = open('logs/log'+str(COUNT), 'a'); COUNT += 1
+    f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
     conf = hpconf.get_next_configuration()
     print(conf)
     for hp in conf:
@@ -59,10 +60,10 @@ current_best = [None, 0]
 
 while(True):
     ## read returned performances and make new config files
-    for logfile in os.listdir('logs'):
+    for logfile in os.listdir(logsdir):
         if 'log' in logfile and '.done' in logfile and '.seen' not in logfile:
             ## read performance
-            f = open('logs/'+logfile, "r")
+            f = open(logsdir+logfile, "r")
             reader = csv.reader(f)
             for line in reader:
                 if len(line) == 2 and 'best validation accuracy' in line[0] and float(line[1]) > current_best[1]:
@@ -71,7 +72,7 @@ while(True):
             print(current_best)
             
             ## cook new conf file
-            f = open('logs/log'+str(COUNT), 'a'); COUNT += 1
+            f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
             conf = hpconf.get_next_configuration()
             print(conf)
             for hp in conf:
@@ -80,6 +81,6 @@ while(True):
             f.close()
             
             ## rename so we know we've already seen it
-            os.rename('logs/'+logfile, 'logs/'+logfile+'.seen')
+            os.rename(logsdir+logfile, logsdir+logfile+'.seen')
             break
     
