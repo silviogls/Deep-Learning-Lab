@@ -12,7 +12,10 @@ while(True):
             configuration = dict()
             for hp in reader:
                 if len(hp) == 2:
-                    configuration[hp[0]] = float(hp[1])
+                    val = float(hp[1])
+                    if 'batch_size' in hp[0] or 'filters' in hp[0]:
+                        val = int(val)
+                    configuration[hp[0]] = val
                 else: break
             print(configuration)
             # run configuration
