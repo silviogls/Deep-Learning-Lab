@@ -40,7 +40,10 @@ class HPConfiguration:
     def get_next_configuration_random(self):
         ret = []
         for hp in self.hps_init:
-            ret.append([hp[0], hp[1]+np.random.rand()*(hp[2]-hp[1])])
+            val = hp[1]+np.random.rand()*(hp[2]-hp[1])
+            if 'batch_size' in hp[0] or 'filters' in hp[0]:
+                val = int(val)
+            ret.append([hp[0], val])
         return ret
 
     def get_next_configuration_grid(self):
