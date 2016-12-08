@@ -29,15 +29,17 @@
     \end{figure}
     
     The learning rate sets the size of the steps taken in gradient descent, so the learning reates that work best are the ones that do steps small enough not to miss the minumum by overshooting it,
-    while still providing a reasonably fast and effective descent. The overshooting phenomenon can be seen in the plot for the biggest rates $LR = \{1,2\}$: for $LR = 2$ it's immediate, then the network sets to a constant loss 
-    not being able to hit a "valley" to descend.
+    while still providing a reasonably fast and effective descent. 
+    
+    The overshooting phenomenon can be seen in the plot for the biggest rates $LR = \{1,2\}$: for $LR = 2$ it's immediate, then the network sets to a constant loss 
+    not, being able to hit a "valley" to descend.
     For $LR = 0.001$ (too small) the training loss decreases extremely slowly, therefore the network risks to get stuck in suboptimal minima.
     
     \paragraph*{Sources of stochasticity}
         \begin{itemize}
         \item random weight initialization
         \item SGD: randomly selected minibatches
-        \item \dots?
+        %\item \dots?
         \end{itemize}
     
     
@@ -56,7 +58,7 @@
     \end{figure}
 
     With the smallest batch size of 20, the best rate is $LR = 0.1$, and this configuration also gives the best overall result. With $BS = 100$ the best learning rate is 0.2, and for $BS = 500$ is $LR = 0.5$.
-    The best results therefore are obtained with directly proportional hyperparameters.
+    The best results are therefore obtained with directly proportional hyperparameters.
     
     The smaller the batch size, the less accurate the gradient estimate on which the network trains (higher variance between different gradients), this means that it makes sense to use a smaller learning rate
     and not make overconfident descent steps on noisy gradients. The noisy descent can be already seen in the learning curve of $BS = 20, LR = 0.1$; with $BS = 20, LR = 0.2$ there is a worse descent on average; 
@@ -109,6 +111,8 @@
     independently from the number of epochs. 
     In 10 seconds the best performing networks have 32 and 64 filters, so this would be chosen with such a time limitation.
     
+    The third plot confirms that it would be better to choose a number of filters like 16 or 32, as they are the best performing in terms of time and error.
+    The plot also suggests that it would make sense to choose a smaller learning rate and/or a bigger batch size, to reduce the oscillation of the learning curves.
     
     
     
@@ -123,21 +127,23 @@
     \paragraph{Best configurations}
         The best results (validation accuracy $> 99.20\%$) for a run of the 5th scenario were:
         \vspace{10px}\\
+        nfilters = 55, BS = 94, M = 0.53, LR = 0.09: validation accuracy = 99.32\% \\
         nfilters = 29, BS = 22, M = 0.19, LR = 0.09: validation accuracy = 99.27\% \\
-        nfilters = 47, BS = 97, M = 0.27, LR = 0.25: validation accuracy = 99.21\% \\
+        nfilters = 27, BS = 28,	M = 0.51, LR = 0.08: validation accuracy = 99.24\% \\
         nfilters = 27, BS = 157, M = 0.68, LR = 0.13: validation accuracy = 99.21\% \\
         nfilters = 36, BS = 104, M = 0.54, LR = 0.24: validation accuracy = 99.21\% \\
         
         It can be seen that these configurations are similar to the best ones found in the previous scenarios.
         The number of filters is bounded in a range between 27 and 47, the batch size between 22 and 157, and
-        the learning rate is neither much lower than 0.1 nor higher than 0.3. The momentum varies a bit more, but scenario 3 showed how
-        momentum is coupled to learning rate.
+        the learning rate is neither much lower than 0.1 nor higher than 0.3. The momentum varies a bit more, 
+        but in scenario 3 the best learning rate - momentum combination was $LR \approx 0.1, M \approx 0.5$, and this is still the case here, 
+        with some variation depending on the other parameters.
     
-    %([['nfilters', ' 47'], ['batch_size_train', ' 97'], ['M', ' 0.265036790206'], ['LR', ' 0.247315511945']], 99.2105264413)
-    %([['nfilters', ' 27'], ['batch_size_train', ' 157'], ['M', ' 0.677290203193'], ['LR', ' 0.12841566961']], 99.2105261276)
-    %([['nfilters', ' 29'], ['batch_size_train', ' 22'], ['M', ' 0.190953660599'], ['LR', ' 0.089002092867']], 99.273684464)
-    %([['nfilters', ' 36'], ['batch_size_train', ' 104'], ['M', ' 0.540759193493'], ['LR', ' 0.236654788034']], 99.2105264413)
-    %([['nfilters', ' 45'], ['batch_size_train', ' 61'], ['M', ' 0.875857510472'], ['LR', ' 0.0279318465298']], 99.2210529352)
     
+\section{Scenario 6}
+    The communication works with the scripts \texttt{master.py} and \texttt{worker.py}. The latter relies on the script \texttt{exercise3.py} to evaluate the hyperparameter settings, and thus requires it to be in the same folder.
+    First we run the master script, which stores the settings in logfiles placed in the \texttt{logs/} folder, then - with master still running - we can launch different workers from different machines.
+    The workers will read the log files and train the network based on the given settings, and once finished they will write the obtained performance on the same files. 
+    To keep track of the status of the log files, the scripts append them file extensions (\texttt{.taken}, \texttt{.done}, \texttt{.seen}). This makes the filenames look a bit silly, but it works.
     
 \end{document}
