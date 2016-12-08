@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.7.14)  7 DEC 2016 17:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.6.10)  8 DEC 2016 02:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **ex3.tex
 (./ex3.tex
 LaTeX2e <2016/02/01>
-Babel <3.9q> and hyphenation patterns for 81 language(s) loaded.
+Babel <3.9q> and hyphenation patterns for 3 language(s) loaded.
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
@@ -142,17 +142,21 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 12.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 12.
+
+
+LaTeX Warning: No \author given.
+
 Package epstopdf Info: Source file: <figures/sc1_tr_loss.eps>
-(epstopdf)                    date: 2016-12-06 14:02:57
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 37569 bytes
 (epstopdf)             Output file: <figures/sc1_tr_loss-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-12-07 12:26:53
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 11961 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc1_tr_loss-eps-co
 nverted-to.pdf figures/sc1_tr_loss.eps>
 (epstopdf)             \includegraphics on input line 17.
 Package epstopdf Info: Output file is already uptodate.
- <figures/sc1_tr_loss-eps-converted-to.pdf, id=1, 1249.66875pt x 875.27pt>
+<figures/sc1_tr_loss-eps-converted-to.pdf, id=1, 1249.66875pt x 875.27pt>
 File: figures/sc1_tr_loss-eps-converted-to.pdf Graphic file (type pdf)
 
 <use figures/sc1_tr_loss-eps-converted-to.pdf>
@@ -160,11 +164,11 @@ Package pdftex.def Info: figures/sc1_tr_loss-eps-converted-to.pdf used on input
  line 17.
 (pdftex.def)             Requested size: 345.0pt x 241.6282pt.
 Package epstopdf Info: Source file: <figures/sc1_val_loss.eps>
-(epstopdf)                    date: 2016-12-07 12:15:11
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 38068 bytes
 (epstopdf)             Output file: <figures/sc1_val_loss-eps-converted-to.pdf>
 
-(epstopdf)                    date: 2016-12-07 12:28:27
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 11887 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc1_val_loss-eps-c
 onverted-to.pdf figures/sc1_val_loss.eps>
@@ -179,10 +183,10 @@ Package pdftex.def Info: figures/sc1_val_loss-eps-converted-to.pdf used on inpu
 t line 22.
 (pdftex.def)             Requested size: 345.0pt x 192.62123pt.
 Package epstopdf Info: Source file: <figures/sc1_val_err.eps>
-(epstopdf)                    date: 2016-12-07 12:15:41
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 39418 bytes
 (epstopdf)             Output file: <figures/sc1_val_err-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-12-07 12:28:27
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 11018 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc1_val_err-eps-co
 nverted-to.pdf figures/sc1_val_err.eps>
@@ -212,10 +216,10 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./figures/sc1_tr_loss-eps-
 converted-to.pdf>]
 Package epstopdf Info: Source file: <figures/sc2_tr_loss.eps>
-(epstopdf)                    date: 2016-12-07 12:33:38
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 33395 bytes
 (epstopdf)             Output file: <figures/sc2_tr_loss-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-12-07 12:40:24
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 9480 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc2_tr_loss-eps-co
 nverted-to.pdf figures/sc2_tr_loss.eps>
@@ -230,11 +234,11 @@ Package pdftex.def Info: figures/sc2_tr_loss-eps-converted-to.pdf used on input
  line 49.
 (pdftex.def)             Requested size: 345.0pt x 258.91325pt.
 Package epstopdf Info: Source file: <figures/sc2_tr_loss_time.eps>
-(epstopdf)                    date: 2016-12-07 12:38:03
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 36573 bytes
 (epstopdf)             Output file: <figures/sc2_tr_loss_time-eps-converted-to.
 pdf>
-(epstopdf)                    date: 2016-12-07 12:54:21
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 10703 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc2_tr_loss_time-e
 ps-converted-to.pdf figures/sc2_tr_loss_time.eps>
@@ -252,10 +256,10 @@ input line 54.
 nverted-to.pdf>] [3 <./figures/sc2_tr_loss-eps-converted-to.pdf> <./figures/sc2
 _tr_loss_time-eps-converted-to.pdf>]
 Package epstopdf Info: Source file: <figures/sc3_tr_loss.eps>
-(epstopdf)                    date: 2016-12-07 12:49:05
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 34157 bytes
 (epstopdf)             Output file: <figures/sc3_tr_loss-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-12-07 12:54:21
+(epstopdf)                    date: 2016-12-08 00:21:27
 (epstopdf)                    size: 9554 bytes
 (epstopdf)             Command: <repstopdf --outfile=figures/sc3_tr_loss-eps-co
 nverted-to.pdf figures/sc3_tr_loss.eps>
@@ -269,76 +273,116 @@ File: figures/sc3_tr_loss-eps-converted-to.pdf Graphic file (type pdf)
 Package pdftex.def Info: figures/sc3_tr_loss-eps-converted-to.pdf used on input
  line 72.
 (pdftex.def)             Requested size: 345.0pt x 192.62123pt.
-Package epstopdf Info: Source file: <figures/sc2_tr_loss_time.eps>
-(epstopdf)                    date: 2016-12-07 12:38:03
-(epstopdf)                    size: 36573 bytes
-(epstopdf)             Output file: <figures/sc2_tr_loss_time-eps-converted-to.
-pdf>
-(epstopdf)                    date: 2016-12-07 12:54:21
-(epstopdf)                    size: 10703 bytes
-(epstopdf)             Command: <repstopdf --outfile=figures/sc2_tr_loss_time-e
-ps-converted-to.pdf figures/sc2_tr_loss_time.eps>
-(epstopdf)             \includegraphics on input line 77.
-Package epstopdf Info: Output file is already uptodate.
-File: figures/sc2_tr_loss_time-eps-converted-to.pdf Graphic file (type pdf)
-
-<use figures/sc2_tr_loss_time-eps-converted-to.pdf>
-Package pdftex.def Info: figures/sc2_tr_loss_time-eps-converted-to.pdf used on 
-input line 77.
-(pdftex.def)             Requested size: 345.0pt x 192.62123pt.
- [4 <./figures/sc3_tr_loss-eps-converted-to.pdf>]
-Package epstopdf Info: Source file: <figures/sc3_tr_loss.eps>
-(epstopdf)                    date: 2016-12-07 12:49:05
-(epstopdf)                    size: 34157 bytes
-(epstopdf)             Output file: <figures/sc3_tr_loss-eps-converted-to.pdf>
-(epstopdf)                    date: 2016-12-07 12:54:21
-(epstopdf)                    size: 9554 bytes
-(epstopdf)             Command: <repstopdf --outfile=figures/sc3_tr_loss-eps-co
-nverted-to.pdf figures/sc3_tr_loss.eps>
+Package epstopdf Info: Source file: <figures/sc4_tr_loss.eps>
+(epstopdf)                    date: 2016-12-08 00:21:27
+(epstopdf)                    size: 35578 bytes
+(epstopdf)             Output file: <figures/sc4_tr_loss-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-12-08 00:44:31
+(epstopdf)                    size: 9804 bytes
+(epstopdf)             Command: <repstopdf --outfile=figures/sc4_tr_loss-eps-co
+nverted-to.pdf figures/sc4_tr_loss.eps>
 (epstopdf)             \includegraphics on input line 88.
 Package epstopdf Info: Output file is already uptodate.
-File: figures/sc3_tr_loss-eps-converted-to.pdf Graphic file (type pdf)
- <use figures/sc3_tr_loss-eps-converted-to.pdf>
-Package pdftex.def Info: figures/sc3_tr_loss-eps-converted-to.pdf used on input
+
+<figures/sc4_tr_loss-eps-converted-to.pdf, id=50, 547.04375pt x 410.53375pt>
+File: figures/sc4_tr_loss-eps-converted-to.pdf Graphic file (type pdf)
+
+<use figures/sc4_tr_loss-eps-converted-to.pdf>
+Package pdftex.def Info: figures/sc4_tr_loss-eps-converted-to.pdf used on input
  line 88.
-(pdftex.def)             Requested size: 345.0pt x 192.62123pt.
-Package epstopdf Info: Source file: <figures/sc2_tr_loss_time.eps>
-(epstopdf)                    date: 2016-12-07 12:38:03
-(epstopdf)                    size: 36573 bytes
-(epstopdf)             Output file: <figures/sc2_tr_loss_time-eps-converted-to.
+(pdftex.def)             Requested size: 345.0pt x 258.91325pt.
+Package epstopdf Info: Source file: <figures/sc4_tr_loss_time.eps>
+(epstopdf)                    date: 2016-12-08 00:21:27
+(epstopdf)                    size: 40178 bytes
+(epstopdf)             Output file: <figures/sc4_tr_loss_time-eps-converted-to.
 pdf>
-(epstopdf)                    date: 2016-12-07 12:54:21
-(epstopdf)                    size: 10703 bytes
-(epstopdf)             Command: <repstopdf --outfile=figures/sc2_tr_loss_time-e
-ps-converted-to.pdf figures/sc2_tr_loss_time.eps>
+(epstopdf)                    date: 2016-12-08 00:44:32
+(epstopdf)                    size: 11099 bytes
+(epstopdf)             Command: <repstopdf --outfile=figures/sc4_tr_loss_time-e
+ps-converted-to.pdf figures/sc4_tr_loss_time.eps>
 (epstopdf)             \includegraphics on input line 93.
 Package epstopdf Info: Output file is already uptodate.
-File: figures/sc2_tr_loss_time-eps-converted-to.pdf Graphic file (type pdf)
 
-<use figures/sc2_tr_loss_time-eps-converted-to.pdf>
-Package pdftex.def Info: figures/sc2_tr_loss_time-eps-converted-to.pdf used on 
+<figures/sc4_tr_loss_time-eps-converted-to.pdf, id=51, 547.04375pt x 410.53375p
+t>
+File: figures/sc4_tr_loss_time-eps-converted-to.pdf Graphic file (type pdf)
+ <use figures/sc4_tr_loss_time-eps-converted-to.pdf>
+Package pdftex.def Info: figures/sc4_tr_loss_time-eps-converted-to.pdf used on 
 input line 93.
-(pdftex.def)             Requested size: 345.0pt x 192.62123pt.
- [5] [6] (./ex3.aux) ) 
+(pdftex.def)             Requested size: 345.0pt x 258.91325pt.
+Package epstopdf Info: Source file: <figures/sc4_val_err_time.eps>
+(epstopdf)                    date: 2016-12-08 00:21:27
+(epstopdf)                    size: 35703 bytes
+(epstopdf)             Output file: <figures/sc4_val_err_time-eps-converted-to.
+pdf>
+(epstopdf)                    date: 2016-12-08 00:45:51
+(epstopdf)                    size: 10094 bytes
+(epstopdf)             Command: <repstopdf --outfile=figures/sc4_val_err_time-e
+ps-converted-to.pdf figures/sc4_val_err_time.eps>
+(epstopdf)             \includegraphics on input line 98.
+Package epstopdf Info: Output file is already uptodate.
+
+<figures/sc4_val_err_time-eps-converted-to.pdf, id=52, 547.04375pt x 410.53375p
+t>
+File: figures/sc4_val_err_time-eps-converted-to.pdf Graphic file (type pdf)
+ <use figures/sc4_val_err_time-eps-converted-to.pdf>
+Package pdftex.def Info: figures/sc4_val_err_time-eps-converted-to.pdf used on 
+input line 98.
+(pdftex.def)             Requested size: 345.0pt x 258.91325pt.
+ [4 <./figures/sc3_tr_loss-eps-converted-to.pdf>]
+
+LaTeX Warning: Text page 5 contains only floats.
+
+
+Overfull \vbox (3.8265pt too high) has occurred while \output is active []
+
+
+[5 <./figures/sc4_tr_loss-eps-converted-to.pdf> <./figures/sc4_tr_loss_time-eps
+-converted-to.pdf>]
+Package epstopdf Info: Source file: <figures/sc5.eps>
+(epstopdf)                    date: 2016-12-08 01:24:36
+(epstopdf)                    size: 30372 bytes
+(epstopdf)             Output file: <figures/sc5-eps-converted-to.pdf>
+(epstopdf)                    date: 2016-12-08 01:25:08
+(epstopdf)                    size: 8636 bytes
+(epstopdf)             Command: <repstopdf --outfile=figures/sc5-eps-converted-
+to.pdf figures/sc5.eps>
+(epstopdf)             \includegraphics on input line 119.
+Package epstopdf Info: Output file is already uptodate.
+
+<figures/sc5-eps-converted-to.pdf, id=74, 410.53375pt x 309.155pt>
+File: figures/sc5-eps-converted-to.pdf Graphic file (type pdf)
+
+<use figures/sc5-eps-converted-to.pdf>
+Package pdftex.def Info: figures/sc5-eps-converted-to.pdf used on input line 11
+9.
+(pdftex.def)             Requested size: 345.0pt x 259.80164pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--130
+
+ []
+
+[6 <./figures/sc4_val_err_time-eps-converted-to.pdf>] [7 <./figures/sc5-eps-con
+verted-to.pdf>] (./ex3.aux) ) 
 Here is how much of TeX's memory you used:
- 1554 strings out of 493029
- 22876 string characters out of 6136234
- 80480 words of memory out of 5000000
- 5076 multiletter control sequences out of 15000+600000
+ 1574 strings out of 494953
+ 23662 string characters out of 6180977
+ 76641 words of memory out of 5000000
+ 4841 multiletter control sequences out of 15000+600000
  7588 words of font info for 27 fonts, out of 8000000 for 9000
- 1141 hyphenation exceptions out of 8191
- 42i,6n,23p,682b,225s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.
-pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texli
-ve/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on ex3.pdf (6 pages, 129849 bytes).
+ 14 hyphenation exceptions out of 8191
+ 42i,6n,23p,297b,225s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texlive/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.
+pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/shar
+e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on ex3.pdf (7 pages, 158417 bytes).
 PDF statistics:
- 87 PDF objects out of 1000 (max. 8388607)
- 59 compressed objects within 1 object stream
+ 116 PDF objects out of 1000 (max. 8388607)
+ 79 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 51 words of extra memory for PDF output out of 10000 (max. 10000000)
 

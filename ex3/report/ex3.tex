@@ -5,7 +5,7 @@
 
 \title{  Exercise 3 \\
         \large Deep Learning lab}
-\author{Silvio Galesso}
+%\author{Silvio Galesso}
 \date{}
 
 \begin{document}
@@ -72,37 +72,72 @@
         \includegraphics[width=\textwidth]{figures/sc3_tr_loss}
         %\caption{Training loss/epoch}
     \end{figure}
-    \begin{figure}[!htb]
-        \centering
-        \includegraphics[width=\textwidth]{figures/sc2_tr_loss_time}
-        %\caption{Training loss/epoch}
-    \end{figure}
     
-    The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter configurations are, in decreasing order, $LR = 0.1, M = 0.5$, $LR = 0.01, M = 0.9$ and $LR = 0.1, M = 0$, showing that the momentum can help slower learning rates to get a better performance. This is evident watching the red, black, and dark green curves, which are relative to the smallest learning rate (0.001): with this rate the network still learns very slowly, but we can see the positive effect of the momentum. This effect is to help the descent algorithm to overcome local minima and to speed up the training accumulating velocity when possible.
+    The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter configurations are, in decreasing order, 
+    $LR = 0.1, M = 0.5$, $LR = 0.01, M = 0.9$ and $LR = 0.1, M = 0$, showing that the momentum can help slower learning rates to get a better performance. 
+    This is evident watching the red, black, and dark green curves, which are relative to the smallest learning rate (0.001): with this rate the network still learns very slowly, but we can see the positive effect of the momentum. 
+    This effect is to help the descent algorithm to overcome local minima and to speed up the training accumulating velocity when possible.
     The only case where momentum is counterproductive is with $LR = 0.1$: in this case the combination between (relatively) high $LR$ and high momentum make the network diverge by "climbing" uphill the loss function.
+    
+    
     
     
 \section*{Scenario 4}
 	\begin{figure}[!htb]
         \centering
-        \includegraphics[width=\textwidth]{figures/sc3_tr_loss}
+        \includegraphics[width=\textwidth]{figures/sc4_tr_loss}
         %\caption{Training loss/epoch}
     \end{figure}
     \begin{figure}[!htb]
         \centering
-        \includegraphics[width=\textwidth]{figures/sc2_tr_loss_time}
+        \includegraphics[width=\textwidth]{figures/sc4_tr_loss_time}
+        %\caption{Training loss/epoch}
+    \end{figure}
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=\textwidth]{figures/sc4_val_err_time}
         %\caption{Training loss/epoch}
     \end{figure}
     
-
+    In the first plot the final training loss is inversely proportional to the number of filters used: with 1-2 layers the network performs badly,
+    increasing nfilters it gets better, until the top performance of 128-256 filters. With many filters, however, the training error curves become
+    progressively "noisier". This is possibly caused by overfitting: maybe the network is not fitting on the common features anymore, 
+    but instead on more example-specific details or noise, thus the oscillations; or maybe too many parameters make the SGD gradient estimate noisier.
+    Therefore, it would be better to choose some intermediate and more stable number of filters, like 32.
+    
+    The plot of training loss over time shows how longer it takes for a network with many filters to achieve the same loss of simpler ones, 
+    independently from the number of epochs. 
+    In 10 seconds the best performing networks have 32 and 64 filters, so this would be chosen with such a time limitation.
+    
+    
+    
     
 \section*{Scenario 5}
     
+    \begin{figure}[!htb]
+        \centering
+        \includegraphics[width=\textwidth]{figures/sc5}
+        %\caption{Training loss/epoch}
+    \end{figure}
     
     \paragraph{Best configurations}
         The best results (validation accuracy $> 99.20\%$) for a run of the 5th scenario were:
+        \vspace{10px}\\
+        nfilters = 29, BS = 22, M = 0.19, LR = 0.09: validation accuracy = 99.27\% \\
+        nfilters = 47, BS = 97, M = 0.27, LR = 0.25: validation accuracy = 99.21\% \\
+        nfilters = 27, BS = 157, M = 0.68, LR = 0.13: validation accuracy = 99.21\% \\
+        nfilters = 36, BS = 104, M = 0.54, LR = 0.24: validation accuracy = 99.21\% \\
         
-        nfilters = 47, batch size= 97, M = 0.265, LR = 0.25: validation accuracy = 99.21
-        
+        It can be seen that these configurations are similar to the best ones found in the previous scenarios.
+        The number of filters is bounded in a range between 27 and 47, the batch size between 22 and 157, and
+        the learning rate is neither much lower than 0.1 nor higher than 0.3. The momentum varies a bit more, but scenario 3 showed how
+        momentum is coupled to learning rate.
+    
+    %([['nfilters', ' 47'], ['batch_size_train', ' 97'], ['M', ' 0.265036790206'], ['LR', ' 0.247315511945']], 99.2105264413)
+    %([['nfilters', ' 27'], ['batch_size_train', ' 157'], ['M', ' 0.677290203193'], ['LR', ' 0.12841566961']], 99.2105261276)
+    %([['nfilters', ' 29'], ['batch_size_train', ' 22'], ['M', ' 0.190953660599'], ['LR', ' 0.089002092867']], 99.273684464)
+    %([['nfilters', ' 36'], ['batch_size_train', ' 104'], ['M', ' 0.540759193493'], ['LR', ' 0.236654788034']], 99.2105264413)
+    %([['nfilters', ' 45'], ['batch_size_train', ' 61'], ['M', ' 0.875857510472'], ['LR', ' 0.0279318465298']], 99.2210529352)
+    
     
 \end{document}
