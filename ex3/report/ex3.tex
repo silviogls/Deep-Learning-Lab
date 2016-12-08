@@ -2,6 +2,9 @@
 
 \usepackage{graphicx}
 \usepackage{epstopdf}
+\usepackage{caption}
+\usepackage[section]{placeins}
+
 
 \title{  Exercise 3 \\
         \large Deep Learning lab}
@@ -15,17 +18,20 @@
 	\begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc1_tr_loss}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 1.1}
     \end{figure}
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc1_val_loss}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 1.2}
     \end{figure}
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc1_val_err}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 1.3}
     \end{figure}
     
     The learning rate sets the size of the steps taken in gradient descent, so the learning reates that work best are the ones that do steps small enough not to miss the minumum by overshooting it,
@@ -49,12 +55,14 @@
 	\begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc2_tr_loss}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 2.1}
     \end{figure}
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc2_tr_loss_time}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 2.2}
     \end{figure}
 
     With the smallest batch size of 20, the best rate is $LR = 0.1$, and this configuration also gives the best overall result. With $BS = 100$ the best learning rate is 0.2, and for $BS = 500$ is $LR = 0.5$.
@@ -72,7 +80,8 @@
 	\begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc3_tr_loss}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 3.1}
     \end{figure}
     
     The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter configurations are, in decreasing order, 
@@ -90,24 +99,30 @@
 	\begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc4_tr_loss}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 4.1}
     \end{figure}
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc4_tr_loss_time}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 4.2}
     \end{figure}
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc4_val_err_time}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 4.3}
     \end{figure}
     
     In the first plot the final training loss is inversely proportional to the number of filters used: with 1-2 layers the network performs badly,
     increasing nfilters it gets better, until the top performance of 128-256 filters. With many filters, however, the training error curves become
-    progressively "noisier". This is possibly caused by overfitting: maybe the network is not fitting on the common features anymore, 
-    but instead on more example-specific details or noise, thus the oscillations; or maybe too many parameters make the SGD gradient estimate noisier.
-    Therefore, it would be better to choose some intermediate and more stable number of filters, like 32.
+    progressively "noisier". 
+    
+    This is possibly caused by the fact that many parameters make the gradient estimate less accurate;
+    another hypothesis is that the network is not fitting on the common features anymore, 
+    but instead on more example-specific details or noise.
+    However, it would be better to choose some intermediate and more stable number of filters, like 32.
     
     The plot of training loss over time shows how longer it takes for a network with many filters to achieve the same loss of simpler ones, 
     independently from the number of epochs. 
@@ -123,7 +138,8 @@
     \begin{figure}[!htb]
         \centering
         \includegraphics[width=\textwidth]{figures/sc5}
-        %\caption{Training loss/epoch}
+        \captionsetup{labelformat=empty}
+        \caption{Figure 5.1}
     \end{figure}
     
     \paragraph{Best configurations}
