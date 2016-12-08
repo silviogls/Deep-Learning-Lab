@@ -7,6 +7,7 @@
 
 
 \title{  Exercise 3 \\
+        \vspace{10px}
         \large Deep Learning lab}
 %\author{Silvio Galesso}
 \date{}
@@ -44,10 +45,9 @@
     \paragraph*{Sources of stochasticity}
         \begin{itemize}
         \item random weight initialization
-        \item SGD: randomly selected minibatches
-        \item dropouts
+        \item SGD: random minibatches
+        \item dropout in fully connected layers
         \end{itemize}
-    
     
     
     
@@ -65,7 +65,7 @@
         \caption{Figure 2.2}
     \end{figure}
 
-    With the smallest batch size of 20, the best rate is $LR = 0.1$, and this configuration also gives the best overall result. With $BS = 100$ the best learning rate is 0.2, and for $BS = 500$ is $LR = 0.5$.
+    With the smallest batch size of 20, the best rate is $LR = 0.1$, and this setting also gives the best overall result. With $BS = 100$ the best learning rate is 0.2, and for $BS = 500$ is $LR = 0.5$.
     The best results are therefore obtained with directly proportional hyperparameters.
     
     The smaller the batch size, the less accurate the gradient estimate on which the network trains (higher variance between the estimated loss gradients), so it makes sense to use a smaller learning rate
@@ -84,7 +84,7 @@
         \caption{Figure 3.1}
     \end{figure}
     
-    The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter configurations are, in decreasing order, 
+    The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter settings are, in decreasing order, 
     $LR = 0.1, M = 0.5$, $LR = 0.01, M = 0.9$ and $LR = 0.1, M = 0$, showing that a higher momentum can help smaller learning rates to get a better performance. 
     
     This is evident watching the red, black, and dark green curves, which are relative to the smallest learning rate (0.001): with this rate the network still learns very slowly, but we can see the positive effect of the momentum. 
@@ -124,11 +124,11 @@
     but instead on more example-specific details or noise.
     However, it would be better to choose some intermediate and more stable number of filters, like 32.
     
-    The plot of training loss over time shows how longer it takes for a network with many filters to achieve the same loss of simpler ones, 
+    Figure 4.2 shows how longer it takes for a network with many filters to achieve the same loss of simpler ones, 
     independently from the number of epochs. 
     In 10 seconds the best performing networks have 32 and 64 filters, so this would be chosen with such a time limitation.
     
-    The third plot confirms that it would be better to choose a number of filters like 16 or 32, as they are the best performing in terms of time and error.
+    Figure 4.3 confirms that it would be better to choose a number of filters like 16 or 32, as they are the best performing in terms of time and error.
     The plot also suggests that it would make sense to choose a smaller learning rate and/or a bigger batch size, to reduce the oscillation of the learning curves.
     
     
@@ -142,16 +142,16 @@
         \caption{Figure 5.1}
     \end{figure}
     
-    \paragraph{Best configurations}
+    \subsubsection*{Best settings}
         The best results (validation accuracy $> 99.20\%$) for a run of the 5th scenario were:
         \vspace{10px}\\
-        nfilters = 55, BS = 94, M = 0.53, LR = 0.09: validation accuracy = 99.32\% \\
-        nfilters = 29, BS = 22, M = 0.19, LR = 0.09: validation accuracy = 99.27\% \\
-        nfilters = 27, BS = 28,	M = 0.51, LR = 0.08: validation accuracy = 99.24\% \\
-        nfilters = 27, BS = 157, M = 0.68, LR = 0.13: validation accuracy = 99.21\% \\
-        nfilters = 36, BS = 104, M = 0.54, LR = 0.24: validation accuracy = 99.21\% \\
+        \texttt{nfilters = 55, BS = 94, M = 0.53, LR = 0.09: 99.32\%} \\
+        \texttt{nfilters = 29, BS = 22, M = 0.19, LR = 0.09: 99.27\%} \\
+        \texttt{nfilters = 27, BS = 28,	M = 0.51, LR = 0.08: 99.24\%} \\
+        \texttt{nfilters = 27, BS = 157, M = 0.68, LR = 0.13: 99.21\%} \\
+        \texttt{nfilters = 36, BS = 104, M = 0.54, LR = 0.24: 99.21\%} \\
         
-        It can be seen that these configurations are similar to the best ones found in the previous scenarios.
+        It can be seen that these settings are similar to the best ones found in the previous scenarios.
         The number of filters is bounded in a range between 27 and 47, the batch size between 22 and 157, and
         the learning rate is neither much lower than 0.1 nor higher than 0.3. The momentum varies a bit more, 
         but in scenario 3 the best learning rate - momentum combination was $LR \approx 0.1, M \approx 0.5$, and this is still the case here, 
@@ -159,9 +159,15 @@
     
     
 \section{Scenario 6}
-    The communication works with the scripts \texttt{master.py} and \texttt{worker.py}. The latter relies on the script \texttt{exercise3.py} to evaluate the hyperparameter settings, and thus requires it to be in the same folder.
-    First we run the master script, which stores the settings in logfiles placed in the \texttt{logs/} folder, then - with master still running - we can launch different workers from different machines.
-    The workers will read the log files and train the network based on the given settings, and once finished they will write the obtained performance on the same files. 
-    To keep track of the status of the log files, the scripts append them file extensions (\texttt{.taken}, \texttt{.done}, \texttt{.seen}). This makes the filenames look a bit silly, but it works.
+    The parallel optimization is done by the scripts \texttt{master.py} and \texttt{worker.py} (in the \texttt{scenario6/} folder). 
+    The latter relies on the script \texttt{exercise3.py} to evaluate the hyperparameter settings, and thus requires it to be in the same folder.
+    
+    First we run the master script, which stores the settings in logfiles placed in the \texttt{logs/} folder, 
+    then - with master still running - we can launch different workers from different machines via \texttt{ssh}.
+    
+    The workers will read the log files and train the network based on the given settings, 
+    and once finished they will write the obtained performance on the same files. 
+    To keep track of the status of the log files, the scripts use file extensions (\texttt{.taken}, \texttt{.done}, \texttt{.seen}). 
+    This makes the filenames look a bit silly, but it works.
     
 \end{document}

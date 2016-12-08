@@ -133,7 +133,7 @@ class Network:
                     Image.fromarray( np.moveaxis((params[r*side+c, :, :, :]*255).astype('uint8'), 0, 2), 'RGB' ), 
                     (r*(filter_size+1), c*(filter_size+1)) )
                     
-        filter_matrix.save("filters/filter_"+str(id)+"_sgd.png")
+        filter_matrix.save("filters/filter_"+str(id)+".png")
             
             
     

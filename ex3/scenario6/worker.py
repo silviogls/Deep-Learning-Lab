@@ -9,17 +9,17 @@ while(True):
             os.rename('logs/'+log, 'logs/'+log+'.taken')
             f = open('logs/'+log+'.taken', 'r')
             reader = csv.reader(f)
-            configuration = dict()
+            setting = dict()
             for hp in reader:
                 if len(hp) == 2:
                     val = float(hp[1])
                     if 'batch_size' in hp[0] or 'filters' in hp[0]:
                         val = int(val)
-                    configuration[hp[0]] = val
+                    setting[hp[0]] = val
                 else: break
-            print(configuration)
-            # run configuration
-            conf_run = exercise3.main(num_epochs=10, **configuration)    ## num_epochs = 2 ofc just for now...
+            print(setting)
+            # run setting
+            conf_run = exercise3.main(num_epochs=1, **setting)    ## num_epochs = 2 ofc just for now...
             # append performance to file...
             
             f.close()

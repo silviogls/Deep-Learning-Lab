@@ -3,9 +3,6 @@ import os
 import csv
 from datetime import datetime
 import time
-## hp object returns the next_configuration as a dictionary of hyperparameters.
-## it computes the new configuration based on some search/optimization algorithm (eg random search)
-
 
 
 class HPConfiguration:
@@ -14,30 +11,29 @@ class HPConfiguration:
         self.hps = []
         
         if mode == 'random':
-            self.get_next_configuration = self.get_next_configuration_random
-        elif mode == 'random_search':
-            self.get_next_configuration = self.get_next_configuration_random_search
+            self.get_next_setting = self.get_next_setting_random
         elif mode == 'grid':
             for hp in hps_init:
                 self.hps.append((hp[0], self.get_hp_gen(hp[1],hp[2],hp[3])))
-            self.get_next_configuration = self.get_next_configuration_grid
+            self.get_next_setting = self.get_next_setting_grid
             
         self.n_hps = len(self.hps_init)
-        self.configuration = [(hp[0],hp[1].next()) for hp in self.hps]
+        self.setting = [(hp[0],hp[1].next()) for hp in self.hps]
         self.results = []
         self.current_hp_idx = 0
         self.current_best = [None, 0]
         self.has_more = 0
-        ## TODO: make version with list or other steps... eliminate the need for numpy?
         
     def get_hp_gen(self, start, stop, step):
         for i in np.arange(start, stop+step, step):
             yield(i)
-        
-    def has_more_configurations(self):
+    
+    ## returns True if there are ore unexplored settings
+    def has_more_settings(self):
         return self.has_more < self.n_hps
-        
-    def get_next_configuration_random(self):
+    
+    ## returns random settings, never ending
+    def get_next_setting_random(self):
         ret = []
         for hp in self.hps_init:
             val = hp[1]+np.random.rand()*(hp[2]-hp[1])
@@ -45,30 +41,22 @@ class HPConfiguration:
                 val = int(val)
             ret.append([hp[0], val])
         return ret
-
-    def get_next_configuration_grid(self):
-        ret = list(self.configuration)
+    
+    ## returns settings using grid search, until there is no more
+    def get_next_setting_grid(self):
+        ret = list(self.setting)
         try:
             newval = self.hps[self.current_hp_idx][1].next()
         except StopIteration:
             self.has_more += 1
-            newval = self.configuration[self.current_hp_idx][1]
+            newval = self.setting[self.current_hp_idx][1]
             
-        self.configuration[self.current_hp_idx] = (self.hps[self.current_hp_idx][0], newval)
+        self.setting[self.current_hp_idx] = (self.hps[self.current_hp_idx][0], newval)
         self.current_hp_idx = (self.current_hp_idx + 1) % len(self.hps)
         return ret
         
-    ## random search, based on best result so far
-    def get_next_configuration_random_search(self, new_performance, config):
-        ret = None
-        raise NotImplementedError
-        ## save in results
-        ## compare with best
-        ## return new configuration
-        return ret
-        
 
-## we are going to put ONE configuration in each file (makes it simpler to code)
+## we are going to put ONE setting in each file (makes it simpler to code)
 #~ logsdir = "logs"+str(datetime.today()).replace(" ","_").replace(":","_").replace(".","_")+"/"
 logsdir = "logs"+"/"
 
@@ -87,11 +75,11 @@ hpconf = HPConfiguration([
                     ('batch_size_train', 32, 256, 32)
                     ], mode='random')
 
-## make initial configuration files
+## make initial setting files
 for i in range(N_WORKERS):
     f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
-    conf = hpconf.get_next_configuration()
-    print("Writing new configuration:")
+    conf = hpconf.get_next_setting()
+    print("Writing new setting:")
     print(str(conf)+"\n")
     for hp in conf:
         f.write(str(hp[0])+", "+str(hp[1])+"\n")
@@ -99,9 +87,9 @@ for i in range(N_WORKERS):
     f.close()
 
 current_best = [None, 0]
-used_configurations = []
+used_settings = []
 
-while(hpconf.has_more_configurations()):
+while(hpconf.has_more_settings()):
     time.sleep(0.05) ## cpu rest
     ## read returned performances and make new config files
     for logfile in os.listdir(logsdir):
@@ -116,19 +104,19 @@ while(hpconf.has_more_configurations()):
                         val_acc = float(line[1])
                     else:
                         conf.append((line[0], line[1]))
-            used_configurations.append((conf, val_acc))
+            used_settings.append((conf, val_acc))
             if val_acc > current_best[1]:
                 current_best = [conf, val_acc]
-                print("\n*** New best configuration *** ")
+                print("\n*** New best setting *** ")
                 print(conf)
                 print("Validation accuracy = "+str(val_acc)+"\n\n")
             
             f.close()
-            conf = hpconf.get_next_configuration()
+            conf = hpconf.get_next_setting()
             
             ## cook new conf file
             f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
-            print("Writing new configuration:")
+            print("Writing new setting:")
             print(str(conf)+"\n")
             for hp in conf:
                 f.write(str(hp[0])+", "+str(hp[1])+"\n")
