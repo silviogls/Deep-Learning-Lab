@@ -39,7 +39,7 @@
         \begin{itemize}
         \item random weight initialization
         \item SGD: randomly selected minibatches
-        %\item \dots?
+        \item dropouts
         \end{itemize}
     
     
@@ -60,7 +60,7 @@
     With the smallest batch size of 20, the best rate is $LR = 0.1$, and this configuration also gives the best overall result. With $BS = 100$ the best learning rate is 0.2, and for $BS = 500$ is $LR = 0.5$.
     The best results are therefore obtained with directly proportional hyperparameters.
     
-    The smaller the batch size, the less accurate the gradient estimate on which the network trains (higher variance between different gradients), this means that it makes sense to use a smaller learning rate
+    The smaller the batch size, the less accurate the gradient estimate on which the network trains (higher variance between the estimated loss gradients), so it makes sense to use a smaller learning rate
     and not make overconfident descent steps on noisy gradients. The noisy descent can be already seen in the learning curve of $BS = 20, LR = 0.1$; with $BS = 20, LR = 0.2$ there is a worse descent on average; 
     with $BS = 20, LR = 0.5$ the network is completely unable to perform descent. Larger batch sizes have smoother curves but slower descents, because the network does less steps per epoch.
     
@@ -76,10 +76,12 @@
     \end{figure}
     
     The plots show that a balanced combination between learning rate and momentum works best. The best hyperparameter configurations are, in decreasing order, 
-    $LR = 0.1, M = 0.5$, $LR = 0.01, M = 0.9$ and $LR = 0.1, M = 0$, showing that the momentum can help slower learning rates to get a better performance. 
+    $LR = 0.1, M = 0.5$, $LR = 0.01, M = 0.9$ and $LR = 0.1, M = 0$, showing that a higher momentum can help smaller learning rates to get a better performance. 
+    
     This is evident watching the red, black, and dark green curves, which are relative to the smallest learning rate (0.001): with this rate the network still learns very slowly, but we can see the positive effect of the momentum. 
     This effect is to help the descent algorithm to overcome local minima and to speed up the training accumulating velocity when possible.
-    The only case where momentum is counterproductive is with $LR = 0.1$: in this case the combination between (relatively) high $LR$ and high momentum make the network diverge by "climbing" uphill the loss function.
+    
+    The only case where a big momentum is counterproductive is with $LR = 0.1$: in this case the combination between (relatively) high $LR$ and high momentum make the network diverge by "climbing" uphill the loss function.
     
     
     
