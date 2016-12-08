@@ -71,8 +71,13 @@ class HPConfiguration:
 ## we are going to put ONE configuration in each file (makes it simpler to code)
 #~ logsdir = "logs"+str(datetime.today()).replace(" ","_").replace(":","_").replace(".","_")+"/"
 logsdir = "logs"+"/"
+
+## make the directory for the logs, and delete all the files inside it before running
 if not os.path.exists(logsdir):
     os.makedirs(logsdir)
+for l in os.listdir(logsdir):
+    os.remove(logsdir+l)
+    
 COUNT = 0
 N_WORKERS = 2
 hpconf = HPConfiguration([
@@ -80,19 +85,21 @@ hpconf = HPConfiguration([
                     ('LR', 0.01, 0.4, 0.02), 
                     ('M', 0, 1, 1e-1), 
                     ('batch_size_train', 32, 256, 32)
-                    ])
+                    ], mode='random')
 
 ## make initial configuration files
 for i in range(N_WORKERS):
     f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
     conf = hpconf.get_next_configuration()
-    print(conf)
+    print("Writing new configuration:")
+    print(str(conf)+"\n")
     for hp in conf:
         f.write(str(hp[0])+", "+str(hp[1])+"\n")
     f.write("\n")
     f.close()
 
 current_best = [None, 0]
+used_configurations = []
 
 while(hpconf.has_more_configurations()):
     time.sleep(0.05) ## cpu rest
@@ -109,13 +116,20 @@ while(hpconf.has_more_configurations()):
                         val_acc = float(line[1])
                     else:
                         conf.append((line[0], line[1]))
-                    
+            used_configurations.append((conf, val_acc))
+            if val_acc > current_best[1]:
+                current_best = [conf, val_acc]
+                print("\n*** New best configuration *** ")
+                print(conf)
+                print("Validation accuracy = "+str(val_acc)+"\n\n")
+            
             f.close()
             conf = hpconf.get_next_configuration()
             
             ## cook new conf file
             f = open(logsdir+'log'+str(COUNT), 'a'); COUNT += 1
-            print(conf)
+            print("Writing new configuration:")
+            print(str(conf)+"\n")
             for hp in conf:
                 f.write(str(hp[0])+", "+str(hp[1])+"\n")
             f.write("\n")
