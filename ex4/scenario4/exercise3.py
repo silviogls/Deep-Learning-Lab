@@ -158,7 +158,7 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 def main(ntrain = 50000, nvalid = 10000, ntest = 10000, algorithm_type = 1,
          batch_size_train = 500, batch_size_valid = 500, batch_size_test = 500,
          num_epochs=500, stat_filename = 'stat.txt', LR = 0.1, M = 0.9,
-         nfilters = 32, time_limit = 10000):
+         nfilters = 32, time_limit = 10000, verbose=False):
     # Load the dataset
     print("Loading data...")
     X_train, y_train, X_val, y_val, X_test, y_test = load_dataset()
@@ -247,12 +247,13 @@ def main(ntrain = 50000, nvalid = 10000, ntest = 10000, algorithm_type = 1,
             val_batches += 1
 
         # Then we print the results for this epoch:
-        print("Epoch {} of {} took {:.3f}s".format(
-            epoch + 1, num_epochs, time.time() - start_time_epoch))
-        print("  training loss:\t\t{:.6f}".format(train_err / train_batches))
-        print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
-        print("  validation accuracy:\t\t{:.2f} %".format(
-            val_acc / val_batches * 100))
+        if verbose:
+            print("Epoch {} of {} took {:.3f}s".format(
+                epoch + 1, num_epochs, time.time() - start_time_epoch))
+            print("  training loss:\t\t{:.6f}".format(train_err / train_batches))
+            print("  validation loss:\t\t{:.6f}".format(val_err / val_batches))
+            print("  validation accuracy:\t\t{:.2f} %".format(
+                val_acc / val_batches * 100))
 
         if (val_acc / val_batches * 100 > best_val_acc):
             best_val_acc = val_acc / val_batches * 100
@@ -274,10 +275,10 @@ def main(ntrain = 50000, nvalid = 10000, ntest = 10000, algorithm_type = 1,
         test_err += err
         test_acc += acc
         test_batches += 1
-    print("Final results:")
-    print("  test loss:\t\t\t{:.6f}".format(test_err / test_batches))
-    print("  test accuracy:\t\t{:.2f} %".format(
-        test_acc / test_batches * 100))
+    if verbose:
+        print("Final results:")
+        print("  test loss:\t\t\t{:.6f}".format(test_err / test_batches))
+        print("  test accuracy:\t\t{:.2f} %".format(test_acc / test_batches * 100))
 
     stat_file.close()
 
