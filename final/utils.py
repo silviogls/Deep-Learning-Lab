@@ -5,20 +5,6 @@ import lasagne
 
 
 ##### dataset loaders
-def load_dataset(data_path):
-    spectrograms = np.load(data_path)
-    spectrograms = spectrograms[:,:10,:] # example, frequency, time
-    data = np.empty((spectrograms.shape[0], 1, spectrograms.shape[1], spectrograms.shape[2]))
-    for i in range(spectrograms.shape[0]):
-            data[i,0,:,:] = spectrograms[i].reshape(1,spectrograms.shape[1],spectrograms.shape[2])
-    print(data.shape)
-    percent_train_data = 0.7
-    n_train_examples = int(percent_train_data*data.shape[0])
-    train_data = data[:n_train_examples].astype(np.float32)
-    test_data = data[n_train_examples:].astype(np.float32)
-    print(train_data.shape)
-    print(test_data.shape)
-    return train_data, test_data
 
 ## loads the dataset from a npz archive, returns a single (merged) training array and a list of test arrays
 def load_dataset_zipped(data_path, train_size=.70, network_type = 'convolutional'):    
@@ -35,7 +21,6 @@ def load_dataset_zipped(data_path, train_size=.70, network_type = 'convolutional
             tmp = np.empty((sp.shape[0], 1, sp.shape[1], sp.shape[2]))
             for i in range(sp.shape[0]):
                     tmp[i,0,:,:] = sp[i].reshape(1,sp.shape[1],sp.shape[2])
-            #print(tmp.shape)
             data.append(tmp.astype(np.float32))
     
     n_train_examples = int(train_size*len(data))
@@ -43,16 +28,19 @@ def load_dataset_zipped(data_path, train_size=.70, network_type = 'convolutional
     train_data = np.concatenate(train_data)
     test_data = data[n_train_examples:]
     print("data shapes:")
-    print(train_data.shape)
-    print(len(test_data))
+    print("  "+str(train_data.shape))
+    print("  "+str(len(test_data)))
     return train_data, test_data
+    
 
 ## loads the dataset from a npz archive, returns training and test examples and labels
-def load_dataset_zipped_supervised(data_path, train_size=.70, network_type = 'convolutional', shuffle=False):    ##
+def load_dataset_zipped_supervised(data_path, train_size=.70, bag_size = 5, network_type = 'convolutional'):    ##
     spectrograms = np.load(data_path)
     spectrograms = [spectrograms[f] for f in spectrograms.files]
     data = []
     labels = []
+    bagged_data = []
+    bagged_labels = []
     # introducing (dummy) channel axis
     
     for (n, sp) in enumerate(spectrograms): # for each song
@@ -64,34 +52,50 @@ def load_dataset_zipped_supervised(data_path, train_size=.70, network_type = 'co
             tmp[i,0,:,:] = sp[i].reshape(1,sp.shape[1],sp.shape[2])
         labels.append(np.array(labels_song).astype(np.float32))
         data.append(tmp.astype(np.float32))
-    
-    if shuffle:
-        data = np.concatenate(data)
-        n_train_examples = int(train_size*data.shape[0])
-        labels = np.concatenate(labels)
-        indices = np.arange(data.shape[0])
-        np.random.shuffle(indices)
-        return data[indices[:n_train_examples]], labels[indices[:n_train_examples]], data[indices[n_train_examples:]], labels[indices[n_train_examples:]]
         
-    n_train_examples = int(train_size*len(data))
-    train_data = data[:n_train_examples]
-    train_labels = labels[:n_train_examples]
-    test_data = data[n_train_examples:]
-    test_labels = labels[n_train_examples:]
-    train_data = np.concatenate(train_data)
-    train_labels = np.concatenate(train_labels)
-    test_data = np.concatenate(test_data)
-    test_labels = np.concatenate(test_labels)
-    print("data shapes:")
-    print("number of songs for training = "+str(n_train_examples))
-    print(train_data.shape)
-    print(train_labels.shape)
-    return train_data, train_labels, test_data, test_labels
+    ## data for bagged classification:
+    # we want a list of numpy arrays, each array contains bag_size equal sized spectrograms. the final prediction is the average of the predictions of these spectrograms
+    for (n, sp) in enumerate(spectrograms): # for each song
+        #print("DBG: song shape  "+str(sp.shape))
+        bag_ids = np.array_split(np.arange(len(sp)), int(len(sp)/bag_size)) # split the indices of the spectrograms in subarrays
+        for ids in bag_ids:    # for each bag of spectrograms
+            tmp = np.empty((len(ids), 1, sp.shape[1], sp.shape[2]))
+            labels_bag = []
+            one_hot_label = np.zeros(len(spectrograms), dtype=np.int); one_hot_label[n]=1
+            labels_bag.append(one_hot_label)
+            for i, id in enumerate(ids):
+                tmp[i,0,:,:] = sp[id].reshape(1,sp.shape[1],sp.shape[2])
+            bagged_labels.append(np.array(labels_bag).astype(np.float32))
+            bagged_data.append(tmp.astype(np.float32))
     
+    data = np.concatenate(data)
+    labels = np.concatenate(labels)
+    n_train_examples = int(train_size*data.shape[0])
+    indices = np.arange(data.shape[0])
+    np.random.shuffle(indices)
     
+    return data[indices[:n_train_examples]], labels[indices[:n_train_examples]], data[indices[n_train_examples:]], labels[indices[n_train_examples:]], bagged_data, bagged_labels
+    
+def get_filters(network, id=""):
+    import matplotlib.pyplot as plt
+    params = lasagne.layers.get_all_layers(network)[2].get_params()[0].get_value()  # the first index is the index of the layer... 2 is because there is a dropout in between input and 1st hidden layer
+    for f in range(params.shape[0]):
+        params[f,:,:,:] -= params[f,:,:,:].min()
+        params[f,:,:,:] /= params[f,:,:,:].max()
+    print("filter shape "+str(params.shape))
+    
+    for i,p in enumerate(params):
+        plt.imshow(p[0,:,:], cmap='gray')
+        plt.savefig("filters/filter"+str(id)+"_"+str(i)+".pdf", bbox_inches='tight')
+        
+        
 
-def build_network_convolutional(input_data=None, input_var=None, n_filters=64, filter_size=(3,5)):
     
+n_filters=64 
+filter_size=(7,15)
+
+def build_network_convolutional(input_data=None, input_var=None, input_dropout_p = 0.3):
+    print(str(n_filters)+" filters,  "+str(filter_size)+".  Input dropout probability = "+str(input_dropout_p))
     #####
     ## n_conv_layers=3, filter_size=(3,7)
     
@@ -112,7 +116,8 @@ def build_network_convolutional(input_data=None, input_var=None, n_filters=64, f
     
     ##### encoder
     en_conv1 = lasagne.layers.Conv2DLayer(
-            input_layer, num_filters = n_filters, filter_size=filter_size,
+            lasagne.layers.DropoutLayer(input_layer, p=input_dropout_p), 
+            num_filters = n_filters, filter_size=filter_size,
             #~ stride = (2,2),
             pad = 'same',
             nonlinearity=lasagne.nonlinearities.rectify,
@@ -121,20 +126,26 @@ def build_network_convolutional(input_data=None, input_var=None, n_filters=64, f
     en_pool1 = lasagne.layers.MaxPool2DLayer(en_conv1, (2,2))
     
     en_conv2 = lasagne.layers.Conv2DLayer(
-            en_pool1, num_filters = n_filters, filter_size=filter_size,
+            en_pool1, 
+            num_filters = n_filters, filter_size=filter_size,
             #~ stride = (2,2),
             pad = 'same',
             nonlinearity=lasagne.nonlinearities.rectify,
             W=lasagne.init.GlorotUniform())
-
+    
+    #en_pool2 = lasagne.layers.MaxPool2DLayer(en_conv2, (2,2))
+    
+    #bottleneck = en_pool2
     bottleneck = en_conv2
 
     print("encoder ok")
     
     ##### decoder
+    #de_pool1 = lasagne.layers.InverseLayer(en_pool2, en_pool2)
     
     de_conv2 = lasagne.layers.Conv2DLayer(
-            en_conv2, num_filters = n_filters, filter_size=filter_size,
+            en_conv2, 
+            num_filters = n_filters, filter_size=filter_size,
             #~ stride = (2,2),
             pad = 'same',
             nonlinearity=lasagne.nonlinearities.rectify,
@@ -144,11 +155,13 @@ def build_network_convolutional(input_data=None, input_var=None, n_filters=64, f
     de_pool2 = lasagne.layers.InverseLayer(de_conv2, en_pool1)
     
     de_conv3 = lasagne.layers.Conv2DLayer(
-            de_pool2, num_filters = 1, filter_size=filter_size,
+            de_pool2, 
+            num_filters = 1, filter_size=filter_size,
             #~ stride = (2,2),
             pad = 'same',
             nonlinearity=lasagne.nonlinearities.rectify,
             W=lasagne.init.GlorotUniform())
+
     network = de_conv3
     
     print("decoder ok")
@@ -156,19 +169,26 @@ def build_network_convolutional(input_data=None, input_var=None, n_filters=64, f
     
     
     #build the classifier with another fully connected layer
-def build_classifier(input_data=None, input_labels=None, input_var=None, n_filters=64, filter_size=(3,5)):
-    #num_classes = max(input_labels)+1
-    num_classes = input_labels.shape[1]
-    print(num_classes)
-    network, bottleneck = build_network_convolutional(input_data=input_data, input_var=input_var, n_filters=n_filters, filter_size=filter_size)
-    print("loading encoder parameters...")
-    with np.load('encoder.npz') as f:
-        param_values = [f['arr_%d' % i] for i in range(len(f.files))]
-    lasagne.layers.set_all_param_values(bottleneck, param_values)
+def build_classifier(encoder_path = 'encoder.npz', input_data=None, input_labels=None, input_var=None, classifier_path=None):
+    num_classes = input_labels.shape[1] # compute num of classes based on the size of the one-hot encoded labels
+    print("Number of classes: "+str(num_classes))
     
-    for layer in lasagne.layers.get_all_layers(bottleneck):
-        for param in layer.params:
-            layer.params[param].discard('trainable')
+    # rebuild the encoder and load the trained parameters
+    network, bottleneck = build_network_convolutional(input_data=input_data, input_var=input_var, input_dropout_p = 0.3)
+    if encoder_path is None:
+        print("using untrained encoder")
+    else:
+        print("loading encoder parameters from "+encoder_path)
+        with np.load(encoder_path) as f:
+            param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+        lasagne.layers.set_all_param_values(bottleneck, param_values)
+    
+    
+    ## freeze encoder parameters
+    #print("freezing encoder parameters!")
+    #for layer in lasagne.layers.get_all_layers(bottleneck):
+        #for param in layer.params:
+            #layer.params[param].discard('trainable')
     
     cl_dense0 = lasagne.layers.DenseLayer(bottleneck, int(num_classes*4+80), nonlinearity=lasagne.nonlinearities.tanh)
     cl_dense1 = lasagne.layers.DenseLayer(cl_dense0, int(num_classes*2+40), nonlinearity=lasagne.nonlinearities.tanh)
@@ -177,7 +197,13 @@ def build_classifier(input_data=None, input_labels=None, input_var=None, n_filte
     #~ cl_out = lasagne.layers.DenseLayer(cl_dense2, num_classes, nonlinearity=None) # linear layer, we applay logsoftmax after
     network = cl_out
     
-    return network
+    if classifier_path is not None:
+        print("loading classifier parameters...")
+        with np.load(classifier_path) as f:
+            param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+        lasagne.layers.set_all_param_values(network, param_values)
+        
+    return network, bottleneck
 
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
