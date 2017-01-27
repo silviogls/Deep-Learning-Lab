@@ -62,9 +62,9 @@ def load_dataset_zipped_supervised(data_path, train_size=.70, bag_size = 5, netw
             tmp = np.empty((len(ids), 1, sp.shape[1], sp.shape[2]))
             labels_bag = []
             one_hot_label = np.zeros(len(spectrograms), dtype=np.int); one_hot_label[n]=1
-            labels_bag.append(one_hot_label)
             for i, id in enumerate(ids):
                 tmp[i,0,:,:] = sp[id].reshape(1,sp.shape[1],sp.shape[2])
+                labels_bag.append(one_hot_label)
             bagged_labels.append(np.array(labels_bag).astype(np.float32))
             bagged_data.append(tmp.astype(np.float32))
     
@@ -169,12 +169,12 @@ def build_network_convolutional(input_data=None, input_var=None, input_dropout_p
     
     
     #build the classifier with another fully connected layer
-def build_classifier(encoder_path = 'encoder.npz', input_data=None, input_labels=None, input_var=None, classifier_path=None):
+def build_classifier(encoder_path = None, input_data=None, input_labels=None, input_var=None, classifier_path=None):
     num_classes = input_labels.shape[1] # compute num of classes based on the size of the one-hot encoded labels
     print("Number of classes: "+str(num_classes))
     
     # rebuild the encoder and load the trained parameters
-    network, bottleneck = build_network_convolutional(input_data=input_data, input_var=input_var, input_dropout_p = 0.3)
+    network, bottleneck = build_network_convolutional(input_data=input_data, input_var=input_var, input_dropout_p = 0.0)
     if encoder_path is None:
         print("using untrained encoder")
     else:

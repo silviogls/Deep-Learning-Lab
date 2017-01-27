@@ -67,7 +67,7 @@ def train(num_epochs, LR, M=0.9, batch_size=256):
             #~ print(tmp)
             test_loss += tmp
             test_batches += 1
-        test_loss = test_loss/test_batches
+
         if best_validation_loss > test_loss:
             best_validation_loss = test_loss
         print("Epoch "+str(epoch)+", test loss = "+str(test_loss/test_batches))
@@ -82,7 +82,7 @@ def train(num_epochs, LR, M=0.9, batch_size=256):
             np.savez('saved_models/encoder_tmp'+str(epoch)+"_"+str(test_loss/test_batches)+'.npz', *lasagne.layers.get_all_param_values(bottleneck))
         
         ## sometimes save/show bottleneck activation, filters...
-        show = True
+        show = False
         if show and epoch>0 and epoch%20==0: 
             
             print("saving filters..."); utils.get_filters(network, epoch)
