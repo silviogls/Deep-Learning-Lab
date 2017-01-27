@@ -6,8 +6,28 @@ import lasagne
 
 ##### dataset loaders
 
+def load_dataset(data_path):
+    spectrograms = np.load(data_path)
+    # add dummy axis for single channel
+    tr_data = spectrograms['arr_0']
+    tr_labels = spectrograms['arr_1'].astype(np.float32)
+    val_data = spectrograms['arr_2']
+    val_labels = spectrograms['arr_3'].astype(np.float32)
+    test_data = spectrograms['arr_4']
+    test_labels = spectrograms['arr_5'].astype(np.float32)
+    tr_data = np.expand_dims(tr_data, axis=1)
+    val_data = np.expand_dims(val_data, axis=1)
+    test_data = np.expand_dims(test_data, axis=1)
+    #print(tr_data.shape)
+    #print(tr_labels.shape)
+    #print(val_data.shape)
+    #print(val_labels.shape)
+    #print(test_data.shape)
+    #print(test_labels.shape)
+    return tr_data, tr_labels, val_data, val_labels, test_data, test_labels
+
 ## loads the dataset from a npz archive, returns a single (merged) training array and a list of test arrays
-def load_dataset_zipped(data_path, train_size=.70, network_type = 'convolutional'):    
+def load_dataset_zipped(data_path, train_size=.70):    
     spectrograms = np.load(data_path)
     spectrograms = [spectrograms[f] for f in spectrograms.files]
     data = []
@@ -34,7 +54,7 @@ def load_dataset_zipped(data_path, train_size=.70, network_type = 'convolutional
     
 
 ## loads the dataset from a npz archive, returns training and test examples and labels
-def load_dataset_zipped_supervised(data_path, train_size=.70, bag_size = 5, network_type = 'convolutional'):    ##
+def load_dataset_zipped_supervised(data_path, train_size=.70, bag_size = 5):    ##
     spectrograms = np.load(data_path)
     spectrograms = [spectrograms[f] for f in spectrograms.files]
     data = []
@@ -85,8 +105,8 @@ def get_filters(network, id=""):
     print("filter shape "+str(params.shape))
     
     for i,p in enumerate(params):
-        plt.imshow(p[0,:,:], cmap='gray')
-        plt.savefig("filters/filter"+str(id)+"_"+str(i)+".pdf", bbox_inches='tight')
+        plt.imshow(p[0,:,:], cmap='gray', interpolation='none')
+        plt.savefig("filters/filter_"+str(id)+"_"+str(i)+".pdf", bbox_inches='tight')
         
         
 
@@ -176,7 +196,7 @@ def build_classifier(encoder_path = None, input_data=None, input_labels=None, in
     # rebuild the encoder and load the trained parameters
     network, bottleneck = build_network_convolutional(input_data=input_data, input_var=input_var, input_dropout_p = 0.0)
     if encoder_path is None:
-        print("using untrained encoder")
+        if classifier_path is None: print("using untrained encoder")
     else:
         print("loading encoder parameters from "+encoder_path)
         with np.load(encoder_path) as f:
@@ -206,7 +226,7 @@ def build_classifier(encoder_path = None, input_data=None, input_labels=None, in
     return network, bottleneck
 
 
-def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
+def iterate_minibatches(inputs, targets, batchsize, shuffle=True):
     assert len(inputs) == len(targets)
     if shuffle:
         indices = np.arange(len(inputs))

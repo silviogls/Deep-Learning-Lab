@@ -2,13 +2,12 @@ import numpy as np
 import os
 import sys
 import time
+import argparse
 
 import theano
 import theano.tensor as T
 import lasagne
 import utils
-
-data_path = ""
 
 ### TODO: try binary classifier!
 
@@ -20,11 +19,9 @@ def log_softmax(x):
 def categorical_crossentropy_logdomain(log_predictions, targets):
     return -T.sum(targets * log_predictions, axis=1)
     
-    
+# this is to test the classifier on the noisy data
 def use(data_path, classifier_path='classifier.npz'):
-    train_data, train_labels, test_data, test_labels, bagged_data, bagged_labels = utils.load_dataset_zipped_supervised(data_path)
-    print(bagged_data[0].shape)
-    print(bagged_labels[0].shape)
+    train_data, train_labels, val_data, val_labels, test_data, test_labels = utils.load_dataset(data_path)
     input_var = T.tensor4('inputs')
     target_var = T.matrix('targets')
     print("building the classifier...")
@@ -47,7 +44,7 @@ def use(data_path, classifier_path='classifier.npz'):
     test_accuracy = 0
     test_outcome = 0
     test_batches = 0
-    for data, labels in zip(bagged_data, bagged_labels):
+    for data, labels in utils.iterate_minibatches(test_data, test_labels, 100):
         tmp_loss, tmp_acc, tmp_outcome = val_fn(data, labels)
         test_loss += tmp_loss
         test_accuracy += tmp_acc
@@ -57,8 +54,8 @@ def use(data_path, classifier_path='classifier.npz'):
     print("test loss = "+str(test_loss/test_batches)+", test accuracy = "+str(test_accuracy/test_batches)+", average accuracy = "+str(test_outcome/test_batches))
     
 
-def train(num_epochs, LR, batch_size=256, encoder_path=None, output_path=''):
-    train_data, train_labels, test_data, test_labels, bagged_data, bagged_labels = utils.load_dataset_zipped_supervised(data_path, train_size = .75)
+def train(num_epochs, LR, data_path, batch_size=256, encoder_path=None, output_path=''):
+    train_data, train_labels, val_data, val_labels, test_data, test_labels = utils.load_dataset(data_path)
     input_var = T.tensor4('inputs')
     target_var = T.matrix('targets')
     print("building the classifier...")
@@ -89,37 +86,50 @@ def train(num_epochs, LR, batch_size=256, encoder_path=None, output_path=''):
             train_loss += tmp
             train_batches += 1
         
-        test_loss = 0
-        test_accuracy = 0
-        test_batches = 0
-        for batch_data, batch_labels in utils.iterate_minibatches(test_data, test_labels, 10):
+        val_loss = 0
+        val_accuracy = 0
+        val_batches = 0
+        for batch_data, batch_labels in utils.iterate_minibatches(val_data, val_labels, 10):
             tmp_loss, tmp_acc = val_fn(batch_data, batch_labels)
-            test_loss += tmp_loss
-            test_accuracy += tmp_acc
-            test_batches += 1
+            val_loss += tmp_loss
+            val_accuracy += tmp_acc
+            val_batches += 1
             
-        if best_validation_loss > test_loss:
-            best_validation_loss = test_loss
+        val_loss = val_loss/val_batches
+        val_accuracy = val_accuracy/val_batches
+        
+        print("Epoch "+str(epoch)+", test loss = "+str(val_loss)+"    test accuracy = "+str(val_accuracy))#
+        progress.write(str(epoch)+",  "+str(val_loss)+",    "+str(val_accuracy)+"\n")
+        progress.flush()
+        
+        if best_validation_loss > val_loss:
+            best_validation_loss = val_loss
+            if best_validation_loss < 1:
+                print("saving classifier..."); np.savez('classifier'+str(output_path)+'.npz', *lasagne.layers.get_all_param_values(network))
+                print("saving filters..."); utils.get_filters(network, output_path)
             
-        print("saving classifier...")
-        np.savez('saved_classifier.npz', *lasagne.layers.get_all_param_values(network))
-            
-        print("Epoch "+str(epoch)+", test loss = "+str(test_loss/test_batches)+"    test accuracy = "+str(test_accuracy/test_batches))#
-        progress.write(str(epoch)+",  "+str(test_loss/test_batches)+",    "+str(test_accuracy/test_batches)+"\n")
+        
     
 if __name__ == '__main__':
     # usage: python classifier.py <train, use> data_path encoder_path(optional)
-    mode = sys.argv[1]
-    data_path = sys.argv[2]
-    parameters_path = None
-    output_path = 'awddw'
-    if len(sys.argv) > 3:
-        parameters_path = sys.argv[3]
-    if len(sys.argv) > 4:
-        output_path = sys.argv[4]    
-    print(data_path)
-    if "train" in mode:
-        train(500, 0.0005, batch_size=256, encoder_path=parameters_path, output_path=output_path)
-    elif "use" in mode:
-        use(data_path, classifier_path=parameters_path)
+    
+    parser = argparse.ArgumentParser(description='Train or use the classifier.')
+    parser.add_argument('mode', 
+                        help='\'train\' or \'use\'')
+    parser.add_argument('-d', '--data_path', 
+                        help='the path of the dataset, for both training and use',
+                        default='dataset.npz', required=False)
+    parser.add_argument('-p', '--parameters_path', 
+                        help='the path of the saved encoder in \'train\' mode (optional), or the path of the saved classifier in \'use\' mode', 
+                        required=False)
+    parser.add_argument('-o', '--output_path', 
+                        help='the path to the output classifier and progress report',
+                        default='out_classifier', required=False)
+    args = parser.parse_args()
+    
+    print("data: "+str(args.data_path))
+    if "train" in args.mode:
+        train(500, 0.00007, args.data_path, batch_size=256, encoder_path=args.parameters_path, output_path=args.output_path)
+    elif "use" in args.mode:
+        use(args.data_path, classifier_path=args.parameters_path)
 
