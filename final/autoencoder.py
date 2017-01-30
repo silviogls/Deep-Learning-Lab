@@ -13,13 +13,13 @@ data_path = 'spectrograms_reduced.npy'
 
 
 def train(num_epochs, LR, M=0.9, batch_size=256):    
-    train_data, test_data = utils.load_dataset_zipped(data_path, train_size = .75)
-    test_data = np.concatenate(test_data)
+    train_data, _, test_data, _, _, _ = utils.load_dataset(data_path)
+    #~ test_data = np.concatenate(test_data)
     input_var = T.tensor4('inputs')
     target_var = T.tensor4('targets')
     
     print("Building network...")
-    network, bottleneck = utils.build_network_convolutional(train_data, input_var)
+    network, bottleneck = utils.build_autoencoder(train_data, input_var)
 
     # l2 regularizer
     l2_penalty = lasagne.regularization.regularize_layer_params(network, lasagne.regularization.l2)*1e-1
@@ -83,15 +83,15 @@ def train(num_epochs, LR, M=0.9, batch_size=256):
         
         ## sometimes save/show bottleneck activation, filters...
         show = False
-        if show and epoch>0 and epoch%20==0: 
+        if show and epoch>0 and epoch%5==0: 
             
             print("saving filters..."); utils.get_filters(network, epoch)
         
             ### show bottleneck activation of one random test spectrogram
-            #i = np.random.randint(0, test_data.shape[0])
-            #t = test_data[i:i+1]
-            #bn = bottleneck_activation_fn(t)
-            #out = output_fn(t)
+            i = np.random.randint(0, test_data.shape[0])
+            t = test_data[i:i+1]
+            bn = bottleneck_activation_fn(t)
+            out = output_fn(t)
             ##print(bn.shape)
             #print("DBG output max: "+str(out.max()))
             
@@ -100,15 +100,15 @@ def train(num_epochs, LR, M=0.9, batch_size=256):
                 #ax.pcolormesh(bn[0][i])
             #plt.show()
             
-            #for i in range(5):
-                #f, axis = plt.subplots(3)
-                #axis[0].pcolormesh(bn[0][i])
-                #axis[0].set_title("bottleneck activation")
-                #axis[1].pcolormesh(t[0][0])     
-                #axis[1].set_title("input")
-                #axis[2].pcolormesh(out[0][0])
-                #axis[2].set_title("output")
-                #plt.show()
+            for i in range(1):
+                f, axis = plt.subplots(3)
+                axis[0].pcolormesh(bn[0][i])
+                axis[0].set_title("bottleneck activation")
+                axis[1].pcolormesh(t[0][0])     
+                axis[1].set_title("input")
+                axis[2].pcolormesh(out[0][0])
+                axis[2].set_title("output")
+                plt.show()
             
             
     
@@ -129,6 +129,10 @@ def train(num_epochs, LR, M=0.9, batch_size=256):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Trains the autoencoder.')
+    parser.add_argument('-d', '--data_path', 
+                        help='the path of the dataset',
+                        default=None, required=True)
     if len(sys.argv)>1:
         data_path = sys.argv[1]
     print(data_path)
