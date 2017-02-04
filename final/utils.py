@@ -8,14 +8,14 @@ import lasagne
 
 def load_dataset(data_path):
     print("loading dataset...")
-    spectrograms = np.load(data_path)
+    spectrograms = np.load(data_path+"_clean.npz")
     # add dummy axis for single channel
     tr_data = spectrograms['arr_0']
     tr_labels = spectrograms['arr_1'].astype(np.float32)
     val_data = spectrograms['arr_2']
     val_labels = spectrograms['arr_3'].astype(np.float32)
     
-    spectrograms = np.load('dataset_20_distorted.npz')
+    spectrograms = np.load(data_path+"_distorted.npz")
     test_data = spectrograms['arr_0']
     test_labels = spectrograms['arr_1'].astype(np.float32)
     tr_data = np.expand_dims(tr_data, axis=1)
@@ -116,7 +116,7 @@ def get_filters(network, id=""):
         
 
     
-n_filters=64 
+n_filters=64
 filter_size=(7,15)
 
 def build_autoencoder(input_data=None, input_var=None, input_dropout_p = 0.3):
@@ -197,14 +197,44 @@ def build_classifier(encoder_path = None, input_data=None, input_labels=None, in
         #for param in layer.params:
             #layer.params[param].discard('trainable')
     
+    #~ cl_dense0 = lasagne.layers.DenseLayer(bottleneck, int(num_classes*2), nonlinearity=lasagne.nonlinearities.tanh)
+    #~ cl_dense1 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense0, p=0.2), 
+                                        #~ int(num_classes*1.3), nonlinearity=lasagne.nonlinearities.tanh)
     cl_dense0 = lasagne.layers.DenseLayer(bottleneck, int(num_classes*2), nonlinearity=lasagne.nonlinearities.tanh)
     cl_dense1 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense0, p=0.2), 
                                         int(num_classes*1.3), nonlinearity=lasagne.nonlinearities.tanh)
-    #~ cl_dense2 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense1, p=0.0), 
-                                        #~ int(num_classes*1.5), nonlinearity=lasagne.nonlinearities.tanh)
-    #~ cl_dense3 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense2, p=0.0), 
-                                        #~ int(num_classes*1.3), nonlinearity=lasagne.nonlinearities.tanh)
-    cl_out = lasagne.layers.DenseLayer(cl_dense1, num_classes, nonlinearity=lasagne.nonlinearities.softmax)
+    cl_dense2 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense0, p=0.2), 
+                                        int(num_classes*1.1), nonlinearity=lasagne.nonlinearities.tanh)
+    
+    cl_out = lasagne.layers.DenseLayer(cl_dense2, num_classes, nonlinearity=lasagne.nonlinearities.softmax)
+    #~ cl_out = lasagne.layers.DenseLayer(cl_dense2, num_classes, nonlinearity=None) # linear layer, we applay logsoftmax after
+    network = cl_out
+    
+    if classifier_path is not None:
+        print("loading classifier parameters...")
+        with np.load(classifier_path) as f:
+            param_values = [f['arr_%d' % i] for i in range(len(f.files))]
+        lasagne.layers.set_all_param_values(network, param_values)
+        
+    return network, bottleneck
+
+
+def build_dummy_classifier(input_data=None, input_labels=None, input_var=None, classifier_path=None):
+    num_classes = input_labels.shape[1] # compute num of classes based on the size of the one-hot encoded labels
+    print("Number of classes: "+str(num_classes))
+    
+    freq_size = input_data.shape[2]
+    time_size = input_data.shape[3]
+    input_layer = lasagne.layers.InputLayer((None, 1, freq_size, time_size), input_var=input_var)
+    bottleneck = network = lasagne.layers.MaxPool2DLayer(input_layer, (2,2))
+    
+    cl_dense0 = lasagne.layers.DenseLayer(bottleneck, int(num_classes*2), nonlinearity=lasagne.nonlinearities.tanh)
+    cl_dense1 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense0, p=0.2), 
+                                        int(num_classes*1.3), nonlinearity=lasagne.nonlinearities.tanh)
+    cl_dense2 = lasagne.layers.DenseLayer(lasagne.layers.DropoutLayer(cl_dense0, p=0.2), 
+                                        int(num_classes*1.1), nonlinearity=lasagne.nonlinearities.tanh)
+    
+    cl_out = lasagne.layers.DenseLayer(cl_dense2, num_classes, nonlinearity=lasagne.nonlinearities.softmax)
     #~ cl_out = lasagne.layers.DenseLayer(cl_dense2, num_classes, nonlinearity=None) # linear layer, we applay logsoftmax after
     network = cl_out
     

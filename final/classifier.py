@@ -39,19 +39,15 @@ def use(data_path, classifier_path='classifier.npz'):
     
     test_fn = theano.function([input_var, target_var, target_mean_var], [loss, accuracy, mean_outcome])
     
-    test_loss = 0
-    test_accuracy = 0
-    test_outcome = 0
-    test_batches = 0
+    test_loss = []
+    test_accuracy = []
+    test_outcome = []
     for data, labels in zip(test_data, test_labels):
         tmp_loss, tmp_acc, tmp_outcome = test_fn(data, labels, labels[0])
-        test_loss += tmp_loss
-        test_accuracy += tmp_acc
-        test_outcome += tmp_outcome
-        test_batches += 1.0
-
-    print("test loss = "+str(test_loss/test_batches)+", test accuracy = "+str(test_accuracy/test_batches)+", average accuracy = "+str(test_outcome/test_batches))
-    
+        test_loss.append(tmp_loss)
+        test_accuracy.append(tmp_acc)
+        test_outcome.append(tmp_outcome)
+    print("test loss = "+str(np.array(test_loss).mean())+", test accuracy = "+str(np.array(test_accuracy).mean())+", average accuracy = "+str(np.array(test_outcome).mean()))
 
 def train(num_epochs, LR, data_path, batch_size=256, encoder_path=None, output_path=None):
     train_data, train_labels, val_data, val_labels, test_data, test_labels = utils.load_dataset(data_path)
@@ -91,6 +87,7 @@ def train(num_epochs, LR, data_path, batch_size=256, encoder_path=None, output_p
         for batch_data, batch_labels in utils.iterate_minibatches(train_data, train_labels, batch_size):
             tmp = train_fn(batch_data, batch_labels)
             train_loss.append(tmp)
+        train_loss = np.array(train_loss).mean()
         
         val_loss = []
         val_accuracy = []
@@ -116,7 +113,7 @@ def train(num_epochs, LR, data_path, batch_size=256, encoder_path=None, output_p
         test_accuracy = np.array(test_accuracy).mean()*100
         test_mean_accuracy = np.array(test_outcome).mean()*100
         
-        perf_line = (str(epoch)+",    "+str(val_loss)+", "+"{:.2f}".format(val_accuracy)+",    "+str(test_loss)+", "+"{:.2f}".format(test_accuracy)+", "+"{:.2f}".format(test_mean_accuracy))
+        perf_line = (str(epoch)+",    "+str(train_loss)+", "+str(val_loss)+", "+"{:.2f}".format(val_accuracy)+",    "+str(test_loss)+", "+"{:.2f}".format(test_accuracy)+", "+"{:.2f}".format(test_mean_accuracy))
         
         print(perf_line)
         if output_path is not None: 
@@ -127,7 +124,7 @@ def train(num_epochs, LR, data_path, batch_size=256, encoder_path=None, output_p
         if best_validation_loss > val_loss:
             best_validation_loss = val_loss
             if output_path is not None and best_validation_loss < 1:
-                print("saving classifier..."); np.savez('classifier'+str(output_path)+'.npz', *lasagne.layers.get_all_param_values(network))
+                print("saving classifier..."); np.savez('classifier_'+str(output_path)+'.npz', *lasagne.layers.get_all_param_values(network))
                 print("saving filters..."); utils.get_filters(network, output_path)
             
         
